@@ -76,6 +76,7 @@ The MVP spec is fully built. What's left is tuning on real footage — every thr
    - `formcheck.yearly` — $39.99/year
 3. App Privacy questionnaire: **"Data Not Collected"** across the board (true — see PRIVACY.md).
 4. Privacy Policy URL: `https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md` (repo must stay public).
+   Support URL: `https://github.com/aymenafia/FormCheck/blob/main/SUPPORT.md`
    Also paste the Terms link into the **App Description** (required for subscription apps): `https://github.com/aymenafia/FormCheck/blob/main/TERMS.md`
 5. Age rating questionnaire (all "None" → 4+), category: Health & Fitness.
 6. Screenshots: capture on device — the live skeleton + bar path is the money shot; X-ray export frames work great too.

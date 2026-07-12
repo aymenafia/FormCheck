@@ -58,6 +58,15 @@ struct SettingsView: View {
                     .pickerStyle(.segmented)
                 }
 
+                Section("Support") {
+                    Link("Help & FAQ",
+                         destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/SUPPORT.md")!)
+                    Link("Report a Problem",
+                         destination: URL(string: "https://github.com/aymenafia/FormCheck/issues")!)
+                    Link("Email Support",
+                         destination: URL(string: "mailto:afia.med.aymen@gmail.com?subject=FormCheck%20Support")!)
+                }
+
                 Section {
                     Link("Manage Subscription",
                          destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
