@@ -16,6 +16,7 @@
 		234349FF6723C9F02A6CE818 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BC44BC652F5B4C1B7CD8C88 /* ShareSheet.swift */; };
 		25680AA947C128A8FCFBE698 /* OverlayMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 252E78AE76DBB772177981E2 /* OverlayMapping.swift */; };
 		288E2D2223B35817649EAB46 /* FormCheckApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 108FA2A2B99A11885640E663 /* FormCheckApp.swift */; };
+		307BC1EB659202D80F2DFC15 /* RatingPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DF86D61FD160589CA1417FF /* RatingPrompt.swift */; };
 		3D55F4B57C9CC3183F60938F /* FeedbackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7269FC21E81103F4C9869F66 /* FeedbackManager.swift */; };
 		3D66D0E2A90C144B5DA8538A /* victory.wav in Resources */ = {isa = PBXBuildFile; fileRef = FA082C35974E0D5EDC5BBEC9 /* victory.wav */; };
 		3D6A08EC9168EE4351B2E403 /* QuizModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691EB67E6BC97BAC4284CDBD /* QuizModels.swift */; };
@@ -53,6 +54,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0DF86D61FD160589CA1417FF /* RatingPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingPrompt.swift; sourceTree = "<group>"; };
 		108FA2A2B99A11885640E663 /* FormCheckApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormCheckApp.swift; sourceTree = "<group>"; };
 		135076EE8E6F21BFFE0A9173 /* HUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDView.swift; sourceTree = "<group>"; };
 		13FB163D53CBCD3D7606DA06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 				135076EE8E6F21BFFE0A9173 /* HUDView.swift */,
 				421D4DD857D602AE92ACAF89 /* LiveSessionView.swift */,
 				252E78AE76DBB772177981E2 /* OverlayMapping.swift */,
+				0DF86D61FD160589CA1417FF /* RatingPrompt.swift */,
 				913EFD0FD325D7F1C0156EC9 /* RepEffectsView.swift */,
 				F0287B82BFA9E9A0EA805B75 /* SetSummaryView.swift */,
 				C481C5ABC2CC78A59C032D6D /* SettingsView.swift */,
@@ -357,6 +360,7 @@
 				BB6057D04B5DD02E29D3D94F /* PoseModels.swift in Sources */,
 				D19701A86438340CB21883BC /* PoseProvider.swift in Sources */,
 				3D6A08EC9168EE4351B2E403 /* QuizModels.swift in Sources */,
+				307BC1EB659202D80F2DFC15 /* RatingPrompt.swift in Sources */,
 				8D41F2455A86C84CA3908C6E /* RepEffectsView.swift in Sources */,
 				6C36CC2D5A46106F1CADB41B /* RepStateMachine.swift in Sources */,
 				8E46EA34D877A37650CD17A5 /* ReplayExporter.swift in Sources */,
