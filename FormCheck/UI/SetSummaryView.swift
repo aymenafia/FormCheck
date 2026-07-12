@@ -18,10 +18,14 @@ struct SetSummaryView: View {
     var body: some View {
         NavigationStack {
             List {
-                gradeSection
-                repsSection
+                if summary.isFreestyle {
+                    freestyleSection
+                } else {
+                    gradeSection
+                    repsSection
+                }
             }
-            .navigationTitle("Set Complete")
+            .navigationTitle(summary.isFreestyle ? "Nice Moves" : "Set Complete")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -65,6 +69,47 @@ struct SetSummaryView: View {
                 try? await Task.sleep(nanoseconds: 1_500_000_000)
                 RatingPrompt.markAsked()
                 requestReview()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var freestyleSection: some View {
+        Section {
+            if let clip = summary.clips.first, summary.recording != nil {
+                VStack(alignment: .leading, spacing: 6) {
+                    Label("Your skeleton clip is ready", systemImage: "figure.dance")
+                        .font(.headline)
+                    Text("Save it or share it — the skeleton is burned in, ready for TikTok.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 6)
+
+                Button {
+                    export(clip, xray: false, save: true)
+                } label: {
+                    Label(exportingClipID == clip.id ? "Saving…" : "Save to Photos",
+                          systemImage: "square.and.arrow.down")
+                }
+                .disabled(exportingClipID != nil)
+
+                Button {
+                    export(clip, xray: false)
+                } label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }
+                .disabled(exportingClipID != nil)
+
+                Button {
+                    export(clip, xray: true)
+                } label: {
+                    Label("Share Skeleton on Black", systemImage: "figure.stand")
+                }
+                .disabled(exportingClipID != nil)
+            } else {
+                Text("No clip recorded. Try again with your whole body in frame.")
+                    .foregroundStyle(.secondary)
             }
         }
     }

@@ -177,7 +177,10 @@ private final class OverlayRenderer {
         isCleanRep = score.faults.isEmpty
         let base: UIColor = score.faults.isEmpty ? .systemGreen : .systemRed
         glowColor = base.withAlphaComponent(0.85).cgColor
-        cardImage = Self.makeCard(size: size, score: score, streak: streak)
+        // Freestyle: skeleton + watermark only, no rep/grade score card.
+        cardImage = score.exercise.isFreestyle
+            ? Self.makeWatermark(size: size)
+            : Self.makeCard(size: size, score: score, streak: streak)
         // Vector assets rasterized once at generous sizes; drawn scaled down.
         skullImage = Self.partImage(score.faults.isEmpty ? "skel-skull" : "skel-skull-dead", height: 420)
         boneImage = Self.partImage("skel-bone", height: 480)
@@ -282,7 +285,8 @@ private final class OverlayRenderer {
                 context.setShadow(offset: .zero, blur: 0, color: nil)
             }
 
-            if let puffProgress {
+            // Rep-lockout effects don't apply to a freestyle clip.
+            if let puffProgress, !exercise.isFreestyle {
                 drawPuffs(context, points: points, progress: puffProgress)
                 if isCleanRep {
                     drawFlexes(context, points: points, progress: puffProgress)
@@ -435,6 +439,24 @@ private final class OverlayRenderer {
     /// Normalized top-left coords → CG (bottom-left origin) pixel coords.
     private func point(_ normalized: CGPoint) -> CGPoint {
         CGPoint(x: normalized.x * size.width, y: size.height - normalized.y * size.height)
+    }
+
+    /// Just the FORMCHECK watermark — used for freestyle clips (no score card).
+    private static func makeWatermark(size: CGSize) -> CGImage? {
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = false
+        let image = UIGraphicsImageRenderer(size: size, format: format).image { _ in
+            let watermark = NSAttributedString(string: "FORMCHECK", attributes: [
+                .font: UIFont.systemFont(ofSize: 36, weight: .black),
+                .foregroundColor: UIColor.white.withAlphaComponent(0.9),
+                .kern: 6,
+            ])
+            let markSize = watermark.size()
+            watermark.draw(at: CGPoint(x: (size.width - markSize.width) / 2,
+                                       y: size.height - markSize.height - 70))
+        }
+        return image.cgImage
     }
 
     private static func makeCard(size: CGSize, score: RepScore, streak: Int) -> CGImage? {

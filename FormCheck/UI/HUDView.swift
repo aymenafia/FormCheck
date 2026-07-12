@@ -69,34 +69,48 @@ struct HUDView: View {
 
             Spacer()
 
-            VStack(spacing: 2) {
-                Text("\(session.repCount)")
-                    .font(.system(size: 96, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
-                    .shadow(color: .black.opacity(0.6), radius: 8)
-                    .contentTransition(.numericText())
-                    .animation(.snappy, value: session.repCount)
-                Text("REPS")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.white.opacity(0.7))
-
-                if session.cleanStreak >= 3 {
-                    Text("🔥 \(session.cleanStreak) in a row")
+            if session.exercise.isFreestyle {
+                // No reps or grade in freestyle — just a recording indicator.
+                HStack(spacing: 8) {
+                    Circle().fill(.red).frame(width: 12, height: 12)
+                    Text("REC")
                         .font(.headline.weight(.black))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 6)
-                        .background(.orange.opacity(0.85), in: Capsule())
                         .foregroundStyle(.white)
-                        .padding(.top, 6)
-                        .transition(.scale.combined(with: .opacity))
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(.black.opacity(0.4), in: Capsule())
+                .padding(.bottom, 44)
+            } else {
+                VStack(spacing: 2) {
+                    Text("\(session.repCount)")
+                        .font(.system(size: 96, weight: .black, design: .rounded))
+                        .foregroundStyle(.white)
+                        .shadow(color: .black.opacity(0.6), radius: 8)
+                        .contentTransition(.numericText())
+                        .animation(.snappy, value: session.repCount)
+                    Text("REPS")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white.opacity(0.7))
 
-                if let last = session.lastScore {
-                    LastRepBadge(score: last)
-                        .padding(.top, 10)
+                    if session.cleanStreak >= 3 {
+                        Text("🔥 \(session.cleanStreak) in a row")
+                            .font(.headline.weight(.black))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 6)
+                            .background(.orange.opacity(0.85), in: Capsule())
+                            .foregroundStyle(.white)
+                            .padding(.top, 6)
+                            .transition(.scale.combined(with: .opacity))
+                    }
+
+                    if let last = session.lastScore {
+                        LastRepBadge(score: last)
+                            .padding(.top, 10)
+                    }
                 }
+                .padding(.bottom, 36)
             }
-            .padding(.bottom, 36)
         }
         .animation(.snappy, value: session.liveWarning)
         .animation(.snappy, value: session.cleanStreak)

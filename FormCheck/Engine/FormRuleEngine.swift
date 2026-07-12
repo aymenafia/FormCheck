@@ -88,6 +88,8 @@ struct SetSummary: Identifiable {
     let id = UUID()
     let clips: [RepClip]
     let recording: SessionRecording?
+    /// Freestyle session: one clip, no grade/reps — just a shareable dance clip.
+    var isFreestyle: Bool = false
 
     var reps: [RepScore] { clips.map(\.score) }
 
@@ -130,6 +132,7 @@ struct FormRuleEngine {
         case .squat: return squatScore(metrics)
         case .deadlift: return deadliftScore(metrics)
         case .bench: return benchScore(metrics)
+        case .freestyle: return repScore(metrics, score: 0, faults: []) // never scored
         }
     }
 

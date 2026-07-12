@@ -127,6 +127,10 @@ struct StartView: View {
                         SetupStep(number: 1, text: "Turn your phone sideways (landscape) at chest height, side-on to the bench")
                         SetupStep(number: 2, text: "Whole bench in frame, ~2.5 m (8 ft) away")
                         SetupStep(number: 3, text: "Hold the bar at lockout to calibrate, then press")
+                    case (.freestyle, _):
+                        SetupStep(number: 1, text: "Prop your phone up, front camera facing you")
+                        SetupStep(number: 2, text: "Stand back so your whole body is in frame")
+                        SetupStep(number: 3, text: "Dance or move — records a skeleton clip to share. No scoring.")
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

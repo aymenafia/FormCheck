@@ -170,6 +170,10 @@ final class SessionViewModel: ObservableObject {
             return
         }
 
+        // Freestyle: just show the skeleton and record. No rep detection,
+        // scoring, warnings, depth flash, trail, or ghost.
+        if exercise.isFreestyle { return }
+
         // Buffer the rep's poses before processing so the completing frame
         // is included when the rep-completed callback slices the buffer.
         if phase == .descending || phase == .ascending, currentRepPoses.count < 400 {
@@ -315,11 +319,19 @@ final class SessionViewModel: ObservableObject {
         isEndingSet = true
         camera.stopRecording { [weak self] recording in
             guard let self else { return }
-            let summary = SetSummary(clips: self.makeClips(recording: recording),
+            let summary: SetSummary
+            if self.exercise.isFreestyle {
+                summary = self.makeFreestyleSummary(recording: recording)
+            } else {
+                summary = SetSummary(clips: self.makeClips(recording: recording),
                                      recording: recording)
+            }
             self.completedSet = summary
-            self.feedback.setEnded(summary)
-            if !summary.reps.isEmpty {
+            // No grade ceremony for freestyle (its placeholder grade is "F").
+            if !summary.isFreestyle {
+                self.feedback.setEnded(summary)
+            }
+            if !summary.isFreestyle, !summary.reps.isEmpty {
                 HistoryStore.shared.add(SetRecord(summary: summary,
                                                   exercise: self.exercise,
                                                   viewMode: self.viewMode))
@@ -331,6 +343,18 @@ final class SessionViewModel: ObservableObject {
             }
         }
         camera.stop()
+    }
+
+    /// Freestyle: one clip spanning the whole recording, no score/grade.
+    private func makeFreestyleSummary(recording: SessionRecording?) -> SetSummary {
+        guard let recording, let end = recording.poses.last?.timestamp, end > 0.3 else {
+            return SetSummary(clips: [], recording: recording, isFreestyle: true)
+        }
+        let placeholder = RepScore(repIndex: 0, exercise: .freestyle, score: 0,
+                                   faults: [], depthAchieved: false,
+                                   eccentricDuration: 0, maxLeanDegrees: 0)
+        let clip = RepClip(score: placeholder, streak: 0, start: 0, end: end)
+        return SetSummary(clips: [clip], recording: recording, isFreestyle: true)
     }
 
     /// Rebases each rep's capture-clock times into the recording timeline,
