@@ -48,22 +48,22 @@ final class EntitlementStore: ObservableObject {
         guard products.isEmpty, !isLoadingProducts else { return }
         isLoadingProducts = true
         defer { isLoadingProducts = false }
-        do {
-            products = try await Product.products(for: Self.productIDs)
-        } catch {
-            lastError = "Couldn't load subscription options. Check your connection and try again."
-        }
+        // A load failure surfaces via the paywall's inline "Try Again" (products
+        // stay empty) — no alert, to avoid double-messaging the same problem.
+        products = (try? await Product.products(for: Self.productIDs)) ?? []
     }
 
     func purchase(_ product: Product) async {
         do {
             let result = try await product.purchase()
             switch result {
-            case .success(let verification):
-                if case .verified(let transaction) = verification {
-                    await transaction.finish()
-                }
+            case .success(.verified(let transaction)):
+                await transaction.finish()
                 await refreshEntitlement()
+            case .success(.unverified):
+                // Charged, but StoreKit couldn't verify (tampered device). Don't
+                // grant access silently — tell the user so they aren't stranded.
+                lastError = "Your purchase couldn't be verified. If you were charged, tap Restore or contact support."
             case .userCancelled, .pending:
                 break
             @unknown default:
@@ -75,7 +75,15 @@ final class EntitlementStore: ObservableObject {
     }
 
     func restorePurchases() async {
-        try? await AppStore.sync()
+        do {
+            try await AppStore.sync()
+        } catch StoreKitError.userCancelled {
+            return // user backed out of the sign-in — say nothing
+        } catch {
+            // A genuine reachability problem, not "no subscription".
+            lastError = "Couldn't reach the App Store to restore. Check your connection and try again."
+            return
+        }
         await refreshEntitlement()
         if !isSubscribed {
             lastError = "No active subscription found to restore."
