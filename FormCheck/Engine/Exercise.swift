@@ -8,6 +8,12 @@ enum Exercise: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    /// Lifts offered in the UI. Bench is withheld from v1 — a lying body is
+    /// where on-device pose estimation is least reliable (Vision is trained
+    /// mostly on upright people), so setup and tracking aren't solid enough
+    /// to ship. Re-add `.bench` here once it's tuned against real footage.
+    static var available: [Exercise] { [.squat, .deadlift] }
+
     /// Only squat: deadlift hides valgus behind the bar, and bench is
     /// side-view by geometry (the rack blocks a front camera anyway).
     var supportsFrontView: Bool { self == .squat }

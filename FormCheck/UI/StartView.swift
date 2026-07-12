@@ -80,7 +80,7 @@ struct StartView: View {
 
             VStack(spacing: 16) {
                 Picker("Exercise", selection: $exercise) {
-                    ForEach(Exercise.allCases) { exercise in
+                    ForEach(Exercise.available) { exercise in
                         Text(exercise.rawValue).tag(exercise)
                     }
                 }
