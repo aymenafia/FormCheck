@@ -504,7 +504,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.formcheck.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aymenafia.formcheck;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -524,7 +524,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.formcheck.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aymenafia.formcheck;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

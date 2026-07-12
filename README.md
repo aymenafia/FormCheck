@@ -70,7 +70,7 @@ The MVP spec is fully built. What's left is tuning on real footage — every thr
 - ✅ Signing: automatic, team `64BD3MXBAX`; version 1.0.0; app icon; launch screen
 
 **To do in App Store Connect** (only the account holder can):
-1. Create the app (bundle ID `com.formcheck.app`).
+1. Create the app (bundle ID `com.aymenafia.formcheck`).
 2. Subscriptions → group "FormCheck Pro" → two auto-renewables matching `Products.storekit` exactly:
    - `formcheck.weekly` — $6.99/week, **3-day free trial** introductory offer
    - `formcheck.yearly` — $39.99/year

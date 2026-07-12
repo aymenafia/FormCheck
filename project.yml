@@ -33,7 +33,7 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.formcheck.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.aymenafia.formcheck
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 64BD3MXBAX

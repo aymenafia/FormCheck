@@ -47,7 +47,7 @@ export default {
 
       // Ignore anything that isn't our app (shared Apple endpoint hygiene).
       const bundleId = payload?.data?.bundleId;
-      if (bundleId && bundleId !== "com.formcheck.app") {
+      if (bundleId && bundleId !== "com.aymenafia.formcheck") {
         return new Response("ignored");
       }
 
