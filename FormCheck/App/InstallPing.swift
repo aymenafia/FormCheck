@@ -12,9 +12,11 @@ import Foundation
 /// DISABLED until `endpoint` is set. Leave it nil to keep the app fully
 /// network-silent (StoreKit aside).
 enum InstallPing {
-    /// Paste the deployed relay URL, e.g.
-    /// `URL(string: "https://formcheck-relay.<you>.workers.dev/install/<INSTALL_SECRET>")`
-    static let endpoint: URL? = nil
+    /// Deployed relay. This install secret is semi-public by design (it ships
+    /// in the binary and this repo is public); worst case is fake 📲 pings —
+    /// rotate INSTALL_SECRET in Cloudflare if that ever happens. The payment
+    /// secret is separate and never leaves Cloudflare/ASC.
+    static let endpoint: URL? = URL(string: "https://formcheck-relay.aymenafia.workers.dev/install/5a805ee62b84f49ba9e8a41b64f4156f6795cca61b823989")
 
     private static let sentKey = "installPing.sent"
 
