@@ -209,9 +209,14 @@ struct SetSummaryView: View {
                 let url = try await ReplayExporter.export(recording: recording, clip: clip, xray: xray)
                 if save {
                     try await PhotoSaver.saveVideo(at: url)
+                    // Clear the spinner as soon as the save completes; the
+                    // toast then times out on its own so buttons re-enable
+                    // immediately instead of after the toast.
+                    exportingClipID = nil
                     showSavedToast = true
                     try? await Task.sleep(nanoseconds: 1_800_000_000)
                     showSavedToast = false
+                    return
                 } else {
                     shareItem = ShareItem(url: url)
                 }
