@@ -80,6 +80,7 @@ The MVP spec is fully built. What's left is tuning on real footage — every thr
    Also paste the Terms link into the **App Description** (required for subscription apps): `https://github.com/aymenafia/FormCheck/blob/main/TERMS.md`
 5. Age rating questionnaire (all "None" → 4+), category: Health & Fitness.
 6. Screenshots: capture on device — the live skeleton + bar path is the money shot; X-ray export frames work great too.
-7. Archive in Xcode (Product → Archive) → Distribute → App Store Connect. First build goes to TestFlight.
+7. Optional but great: deploy the real-time payment-ping relay ([relay/README.md](relay/README.md)), then set its URL under App Information → App Store Server Notifications (V2, Production + Sandbox).
+8. Archive in Xcode (Product → Archive) → Distribute → App Store Connect. First build goes to TestFlight.
 
 **Review notes tip:** in "Notes for Review", tell Apple the camera requirement: "Requires a camera pointed at a person exercising; all processing is on-device." Attach a short demo video link if asked.

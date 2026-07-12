@@ -1,0 +1,9 @@
+name = "formcheck-relay"
+main = "worker.js"
+compatibility_date = "2026-07-01"
+
+# Secrets (set with `wrangler secret put <NAME>`, never commit values):
+#   RELAY_SECRET          — random string, becomes part of the URL path
+#   DISCORD_WEBHOOK_URL   — optional, Discord channel webhook
+#   TELEGRAM_BOT_TOKEN    — optional, from @BotFather
+#   TELEGRAM_CHAT_ID      — optional, your chat/channel id
