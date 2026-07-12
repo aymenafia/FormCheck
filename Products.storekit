@@ -63,7 +63,12 @@
           "familyShareable" : false,
           "groupNumber" : 1,
           "internalID" : "21000004",
-          "introductoryOffer" : null,
+          "introductoryOffer" : {
+            "internalID" : "21000005",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
           "localizations" : [
             {
               "description" : "A full year of your AI squat coach",

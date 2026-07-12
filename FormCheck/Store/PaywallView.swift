@@ -1,21 +1,32 @@
 import StoreKit
 import SwiftUI
 
-/// Hard paywall: yearly pre-selected, weekly carries the 3-day free trial.
+/// Conversion-optimized hard paywall. Ethical psychology only — no fake
+/// urgency or hidden terms (both violate 3.1.2 and burn trust):
+///  • Trial timeline (Today → reminder → billed) to remove payment anxiety
+///  • Trial as the default path, with a benefit-led CTA
+///  • Per-week anchoring so the annual plan reads as the obvious value
 struct PaywallView: View {
     @ObservedObject var store: EntitlementStore
     @State private var selectedID = EntitlementStore.yearlyID
     @State private var isPurchasing = false
 
+    private var selectedProduct: Product? {
+        store.products.first { $0.id == selectedID }
+    }
+
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 24) {
+                VStack(spacing: 22) {
                     header
                     benefits
+                    if let days = trialDays(selectedProduct) {
+                        trialTimeline(days: days)
+                    }
                     planCards
                 }
-                .padding(.top, 24)
+                .padding(.top, 20)
             }
             footer
         }
@@ -31,12 +42,14 @@ struct PaywallView: View {
         }
     }
 
+    // MARK: - Header
+
     private var header: some View {
         VStack(spacing: 10) {
             Image(systemName: "figure.strengthtraining.traditional")
-                .font(.system(size: 52))
+                .font(.system(size: 48))
                 .foregroundStyle(.green)
-            Text("Unlock your AI squat coach")
+            Text("Fix your form.\nLift with confidence.")
                 .font(.title.weight(.black))
                 .multilineTextAlignment(.center)
         }
@@ -45,12 +58,12 @@ struct PaywallView: View {
     private var benefits: some View {
         VStack(alignment: .leading, spacing: 14) {
             benefit("waveform.path.ecg", "Live form scoring on every rep")
-            benefit("speaker.wave.2.fill", "Voice callouts — depth, lean, tempo")
-            benefit("film.fill", "Slow-mo skeleton replays to share")
-            benefit("lock.shield.fill", "100% on-device. Video never leaves your phone")
+            benefit("speaker.wave.2.fill", "A coach that calls out mistakes as you lift")
+            benefit("film.fill", "Slow-mo replays worth sharing")
+            benefit("lock.shield.fill", "100% on-device — your video never leaves your phone")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
+        .padding(18)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
     }
 
@@ -61,8 +74,64 @@ struct PaywallView: View {
                 .frame(width: 26)
             Text(text)
                 .font(.subheadline.weight(.medium))
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
+
+    // MARK: - Trial timeline (the conversion driver)
+
+    private func trialTimeline(days: Int) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("How your \(days)-day free trial works")
+                .font(.headline)
+                .padding(.bottom, 14)
+
+            timelineRow(icon: "lock.open.fill", color: .green,
+                        title: "Today",
+                        subtitle: "Full access unlocks. Scan your first set in seconds.",
+                        showLine: true)
+            timelineRow(icon: "bell.fill", color: .green,
+                        title: "Day \(max(days - 1, 1))",
+                        subtitle: "We'll remind you before your trial ends.",
+                        showLine: true)
+            timelineRow(icon: "star.fill", color: .secondary,
+                        title: "Day \(days)",
+                        subtitle: "Your plan begins — cancel anytime before then and pay nothing.",
+                        showLine: false)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(18)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+    }
+
+    private func timelineRow(icon: String, color: Color, title: String,
+                             subtitle: String, showLine: Bool) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            VStack(spacing: 0) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(color == .secondary ? Color.secondary : .black)
+                    .frame(width: 34, height: 34)
+                    .background(Circle().fill(color == .secondary ? Color.white.opacity(0.15) : Color.green))
+                if showLine {
+                    Rectangle()
+                        .fill(Color.green.opacity(0.4))
+                        .frame(width: 3, height: 30)
+                }
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.subheadline.weight(.bold))
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.top, 4)
+            Spacer(minLength: 0)
+        }
+    }
+
+    // MARK: - Plans
 
     private var planCards: some View {
         VStack(spacing: 12) {
@@ -71,47 +140,37 @@ struct PaywallView: View {
                     ProgressView("Loading plans…")
                         .padding(.vertical, 24)
                 } else {
-                    // Load failed (offline?) — never leave the user with an
-                    // infinite spinner and no way forward.
                     VStack(spacing: 10) {
                         Text("Couldn't load subscription plans.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
-                        Button("Try Again") {
-                            Task { await store.loadProducts() }
-                        }
-                        .buttonStyle(.bordered)
+                        Button("Try Again") { Task { await store.loadProducts() } }
+                            .buttonStyle(.bordered)
                     }
                     .padding(.vertical, 20)
                 }
             } else {
                 if let yearly = store.yearly {
-                    planCard(
-                        id: yearly.id,
-                        title: "Yearly",
-                        price: "\(yearly.displayPrice) / year",
-                        detail: yearlyDetail(for: yearly),
-                        badge: savingsBadge(yearly: yearly, weekly: store.weekly)
-                    )
+                    planCard(product: yearly, title: "Yearly",
+                             price: "\(yearly.displayPrice) / year",
+                             detail: yearlyDetail(for: yearly),
+                             badge: savingsBadge(yearly: yearly, weekly: store.weekly))
                 }
                 if let weekly = store.weekly {
-                    planCard(
-                        id: weekly.id,
-                        title: "Weekly",
-                        price: "\(weekly.displayPrice) / week",
-                        detail: "3-day free trial, cancel anytime",
-                        badge: nil
-                    )
+                    planCard(product: weekly, title: "Weekly",
+                             price: "\(weekly.displayPrice) / week",
+                             detail: trialDays(weekly).map { "\($0)-day free trial, then billed weekly" } ?? "Billed weekly",
+                             badge: nil)
                 }
             }
         }
     }
 
-    /// Derived marketing math must come from storefront prices — hardcoded
-    /// USD figures would be wrong (and in the wrong currency) elsewhere.
     private func yearlyDetail(for yearly: Product) -> String {
         let perWeek = yearly.price / 52
-        return "That's \(perWeek.formatted(yearly.priceFormatStyle)) a week"
+        let base = "Just \(perWeek.formatted(yearly.priceFormatStyle)) a week"
+        if let days = trialDays(yearly) { return "\(days)-day free trial · \(base)" }
+        return base
     }
 
     private func savingsBadge(yearly: Product, weekly: Product?) -> String {
@@ -124,10 +183,11 @@ struct PaywallView: View {
         return "BEST VALUE · SAVE \(percent)%"
     }
 
-    private func planCard(id: String, title: String, price: String, detail: String, badge: String?) -> some View {
-        let isSelected = selectedID == id
+    private func planCard(product: Product, title: String, price: String,
+                          detail: String, badge: String?) -> some View {
+        let isSelected = selectedID == product.id
         return Button {
-            selectedID = id
+            selectedID = product.id
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 if let badge {
@@ -139,61 +199,58 @@ struct PaywallView: View {
                         .foregroundStyle(.black)
                 }
                 HStack {
-                    Text(title)
-                        .font(.headline)
+                    Text(title).font(.headline)
                     Spacer()
-                    Text(price)
-                        .font(.headline)
+                    Text(price).font(.headline)
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                         .foregroundStyle(isSelected ? .green : .secondary)
                 }
                 Text(detail)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(isSelected ? .green : .secondary)
             }
             .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(isSelected ? Color.green.opacity(0.15) : Color.white.opacity(0.06))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(isSelected ? Color.green : .clear, lineWidth: 2)
-            )
+            .background(RoundedRectangle(cornerRadius: 16)
+                .fill(isSelected ? Color.green.opacity(0.15) : Color.white.opacity(0.06)))
+            .overlay(RoundedRectangle(cornerRadius: 16)
+                .stroke(isSelected ? Color.green : .clear, lineWidth: 2))
         }
         .buttonStyle(.plain)
     }
 
+    // MARK: - Footer / CTA
+
     private var footer: some View {
-        VStack(spacing: 10) {
-            Button {
-                purchaseSelected()
-            } label: {
+        VStack(spacing: 8) {
+            Button(action: purchaseSelected) {
                 Group {
                     if isPurchasing {
                         ProgressView()
                     } else {
-                        Text(selectedID == EntitlementStore.weeklyID ? "Start My Free Trial" : "Continue")
-                            .font(.headline)
+                        Text(ctaTitle).font(.headline)
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
+                .padding(.vertical, 8)
             }
             .buttonStyle(.borderedProminent)
             .tint(.green)
             .disabled(isPurchasing || store.products.isEmpty)
 
-            // Guideline 3.1.2: auto-renew disclosure at the point of purchase.
-            Text("Subscriptions renew automatically until cancelled. Cancel anytime in Settings → Apple Account → Subscriptions.")
+            // Reassurance directly under the button — the anxiety killer.
+            if trialDays(selectedProduct) != nil {
+                Label("No charge today · Cancel anytime", systemImage: "checkmark.shield.fill")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.green)
+            }
+
+            Text("Auto-renews until cancelled in Settings → Apple Account → Subscriptions.")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
             HStack(spacing: 16) {
-                Button("Restore Purchases") {
-                    Task { await store.restorePurchases() }
-                }
+                Button("Restore") { Task { await store.restorePurchases() } }
                 Link("Terms", destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/TERMS.md")!)
                 Link("Privacy", destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md")!)
                 #if DEBUG
@@ -208,8 +265,33 @@ struct PaywallView: View {
         .padding(.bottom, 12)
     }
 
+    private var ctaTitle: String {
+        if let days = trialDays(selectedProduct) {
+            return "Start My \(days)-Day Free Trial"
+        }
+        return "Continue"
+    }
+
+    // MARK: - Trial detection (drives all trial messaging honestly)
+
+    /// Number of free-trial days on a product, or nil if it has no free trial.
+    /// Reads the real StoreKit intro offer, so messaging can never claim a
+    /// trial the product doesn't actually have.
+    private func trialDays(_ product: Product?) -> Int? {
+        guard let offer = product?.subscription?.introductoryOffer,
+              offer.paymentMode == .freeTrial else { return nil }
+        let p = offer.period
+        switch p.unit {
+        case .day: return p.value
+        case .week: return p.value * 7
+        case .month: return p.value * 30
+        case .year: return p.value * 365
+        @unknown default: return p.value
+        }
+    }
+
     private func purchaseSelected() {
-        guard let product = store.products.first(where: { $0.id == selectedID }) else { return }
+        guard let product = selectedProduct else { return }
         isPurchasing = true
         Task {
             await store.purchase(product)
