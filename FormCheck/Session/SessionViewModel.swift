@@ -42,6 +42,8 @@ final class SessionViewModel: ObservableObject {
     private var repMetrics: [RepMetrics] = []
     private var depthFiredThisRep = false
     private var depthRawStreak = 0
+    private var pendingLiveFault: FormFault?
+    private var liveFaultStreak = 0
     private var isEndingSet = false
     private var currentRepPoses: [(time: TimeInterval, pose: PoseFrame)] = []
     private var bestRepPoses: [(offset: TimeInterval, pose: PoseFrame)] = []
@@ -257,14 +259,23 @@ final class SessionViewModel: ObservableObject {
 
     /// Mid-rep coaching is the demo moment: the fault is called out while
     /// it's still fixable, with the offending joints ringed on screen.
+    /// A fault must persist a few frames before it shows — one noisy frame
+    /// must never flash a big red accusation.
     private func updateLiveWarning(for frame: PoseFrame) {
-        guard phase == .descending || phase == .ascending,
-              let fault = detectLiveFault(in: frame) else {
+        let candidate = (phase == .descending || phase == .ascending)
+            ? detectLiveFault(in: frame) : nil
+        if let candidate {
+            liveFaultStreak = (candidate == pendingLiveFault) ? liveFaultStreak + 1 : 1
+            pendingLiveFault = candidate
+            if liveFaultStreak >= 3 {
+                if liveWarning != candidate { liveWarning = candidate }
+                feedback.liveWarning(candidate, at: frame.timestamp)
+            }
+        } else {
+            liveFaultStreak = 0
+            pendingLiveFault = nil
             if liveWarning != nil { liveWarning = nil }
-            return
         }
-        if liveWarning != fault { liveWarning = fault }
-        feedback.liveWarning(fault, at: frame.timestamp)
     }
 
     /// Live thresholds sit slightly past the scoring thresholds so the banner

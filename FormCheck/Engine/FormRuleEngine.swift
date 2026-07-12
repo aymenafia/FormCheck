@@ -142,8 +142,10 @@ struct FormRuleEngine {
 
         switch metrics.viewMode {
         case .side:
-            // Depth is only visible side-on; the front view can't judge it reliably.
-            if !metrics.depthAchieved {
+            // Depth is only visible side-on; the front view can't judge it
+            // reliably. And only flag "shallow" when depth is actually KNOWN —
+            // a poorly-tracked knee must not produce a false depth accusation.
+            if metrics.depthKnown, !metrics.depthAchieved {
                 faults.append(.shallowDepth)
                 score -= 40
             }

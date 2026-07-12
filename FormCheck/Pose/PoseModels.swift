@@ -46,7 +46,20 @@ struct PoseFrame {
         (.rightHip, .rightKnee), (.rightKnee, .rightAnkle),
     ]
 
+    /// Minimum confidence to *draw* a joint (keep the skeleton alive) and to
+    /// *count reps* (be forgiving so real reps aren't missed).
     static let minConfidence: Float = 0.2
+
+    /// Higher bar to make a *form judgment* (depth, lean, valgus, bar drift).
+    /// A joint tracked below this is too uncertain to accuse someone of bad
+    /// form — better to stay silent than flag a fault that isn't there. This
+    /// is the single biggest guard against false-positive "your form is bad"
+    /// calls, which are what earn an app one-star reviews.
+    static let formConfidence: Float = 0.5
+
+    private func isConfident(_ joints: Joint..., threshold: Float) -> Bool {
+        joints.allSatisfy { (self.joints[$0]?.confidence ?? 0) >= threshold }
+    }
 
     func midpoint(of a: Joint, _ b: Joint) -> CGPoint? {
         guard let pa = joints[a], let pb = joints[b],
@@ -78,10 +91,11 @@ struct PoseFrame {
 
     /// Side view: the clearly-seen (camera-side) knee. The far knee is often
     /// occluded and misplaced, and a midpoint would drag depth judgment off.
+    /// Requires form-grade confidence — a shaky knee must not drive a depth call.
     var mostConfidentKneeY: CGFloat? {
         [joints[.leftKnee], joints[.rightKnee]]
             .compactMap { $0 }
-            .filter { $0.confidence >= Self.minConfidence }
+            .filter { $0.confidence >= Self.formConfidence }
             .max { $0.confidence < $1.confidence }?
             .location.y
     }
@@ -113,8 +127,16 @@ struct PoseFrame {
 
     /// Torso angle from vertical in degrees (0 = perfectly upright).
     /// Corrects for the image aspect ratio since coordinates are normalized per-axis.
+    /// Only computed when hips and shoulders are confidently tracked — a lean
+    /// accusation on guessed joints is worse than no accusation.
     var torsoLeanDegrees: Double? {
-        guard let hip = hipCenter, let shoulder = shoulderCenter else { return nil }
+        guard let hip = hipCenter, let shoulder = shoulderCenter,
+              (isConfident(.leftHip, .rightHip, threshold: Self.formConfidence)
+               || isConfident(.root, threshold: Self.formConfidence)),
+              isConfident(.leftShoulder, .rightShoulder, threshold: Self.formConfidence)
+                || (joints[.leftShoulder]?.confidence ?? 0) >= Self.formConfidence
+                || (joints[.rightShoulder]?.confidence ?? 0) >= Self.formConfidence
+        else { return nil }
         let dx = Double(shoulder.x - hip.x) * Double(imageAspect)
         let dy = Double(hip.y - shoulder.y) // positive when shoulders are above hips
         guard dy > 0.001 else { return 90 }
@@ -151,7 +173,7 @@ struct PoseFrame {
     var kneeSeparationRatio: CGFloat? {
         guard let lk = joints[.leftKnee], let rk = joints[.rightKnee],
               let la = joints[.leftAnkle], let ra = joints[.rightAnkle],
-              min(lk.confidence, rk.confidence, la.confidence, ra.confidence) >= Self.minConfidence
+              min(lk.confidence, rk.confidence, la.confidence, ra.confidence) >= Self.formConfidence
         else { return nil }
         let ankleWidth = abs(la.location.x - ra.location.x)
         guard ankleWidth > 0.02 else { return nil } // feet together / side view — ratio is meaningless
@@ -163,7 +185,9 @@ struct PoseFrame {
     var lateralShiftRatio: CGFloat? {
         guard let hip = hipCenter,
               let la = joints[.leftAnkle], let ra = joints[.rightAnkle],
-              min(la.confidence, ra.confidence) >= Self.minConfidence else { return nil }
+              min(la.confidence, ra.confidence) >= Self.formConfidence,
+              isConfident(.leftHip, .rightHip, threshold: Self.formConfidence)
+                || isConfident(.root, threshold: Self.formConfidence) else { return nil }
         let ankleWidth = abs(la.location.x - ra.location.x)
         guard ankleWidth > 0.02 else { return nil }
         let ankleMidX = (la.location.x + ra.location.x) / 2

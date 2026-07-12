@@ -43,8 +43,14 @@ struct RepMetrics {
     var eccentricDuration: TimeInterval { bottomTime - startTime }
     var concentricDuration: TimeInterval { endTime - bottomTime }
 
+    /// Whether the knee was confidently tracked at the bottom, so depth is
+    /// actually known. If false, we must NOT accuse the lifter of a shallow
+    /// squat — we simply don't know.
+    var depthKnown: Bool { kneeYAtBottom != nil }
+
     /// Squat parallel ≈ hip joint level with the knee joint in the image.
-    /// Top-left origin, so a larger y means lower in frame.
+    /// Top-left origin, so a larger y means lower in frame. Only meaningful
+    /// when `depthKnown`.
     var depthAchieved: Bool {
         guard let kneeY = kneeYAtBottom else { return false }
         return bottomY >= kneeY - 0.02
