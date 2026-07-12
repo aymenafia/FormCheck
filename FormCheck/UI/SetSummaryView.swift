@@ -4,6 +4,7 @@ struct SetSummaryView: View {
     let summary: SetSummary
     let onDone: () -> Void
 
+    @Environment(\.requestReview) private var requestReview
     @State private var exportingClipID: UUID?
     @State private var shareItem: ShareItem?
     @State private var exportErrorMessage: String?
@@ -57,6 +58,14 @@ struct SetSummaryView: View {
                 }
             }
             .animation(.snappy, value: showSavedToast)
+            .task {
+                // Ask for a rating on a high note — after a few good sets,
+                // and after the grade/confetti has had a beat to land.
+                guard RatingPrompt.shouldAsk(for: summary) else { return }
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+                RatingPrompt.markAsked()
+                requestReview()
+            }
         }
     }
 

@@ -323,6 +323,11 @@ final class SessionViewModel: ObservableObject {
                 HistoryStore.shared.add(SetRecord(summary: summary,
                                                   exercise: self.exercise,
                                                   viewMode: self.viewMode))
+                // Monotonic completed-set count drives the rating prompt's
+                // timing (survives history deletions).
+                let key = "stats.completedSets"
+                let n = UserDefaults.standard.integer(forKey: key) + 1
+                UserDefaults.standard.set(n, forKey: key)
             }
         }
         camera.stop()
