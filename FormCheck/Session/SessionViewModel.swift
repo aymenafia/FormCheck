@@ -121,7 +121,6 @@ final class SessionViewModel: ObservableObject {
         ghostPending = false
         isEndingSet = false
         completedSet = nil
-        cleanUpOldTempVideos()
         latestPose = nil
         liveWarning = nil
         placementComplete = false
@@ -147,6 +146,7 @@ final class SessionViewModel: ObservableObject {
         camera.stop()
         completedSet = nil
         isActive = false
+        cleanUpOldTempVideos()
     }
 
     /// When tracking is lost, remove the frozen skeleton instead of leaving
@@ -357,6 +357,9 @@ final class SessionViewModel: ObservableObject {
         }
         completedSet = nil
         isActive = false
+        // Sweep here — never during start(), where a late-running sweep could
+        // race the new set's recording.
+        cleanUpOldTempVideos()
     }
 
     /// Sweep set recordings and exported clips from previous sessions out of

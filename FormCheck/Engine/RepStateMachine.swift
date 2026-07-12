@@ -182,11 +182,13 @@ final class RepStateMachine {
                 minEarlyShoulderHipRatio = nil
                 maxBarDrift = nil
                 setPhase(.descending)
-            } else if abs(hipY - standingHipY) < descentThreshold * 0.4 {
+            } else if abs(hipY - standingHipY) < descentThreshold * 0.8 {
                 // Track slow drift (stance shifts, camera settling) — but only
-                // in a tight band around the baseline. An unbounded EMA here
+                // inside a band below the rep trigger. An unbounded EMA here
                 // would chase the hip down during a slow tempo eccentric and
-                // the rep would never trigger.
+                // the rep would never trigger; a slow descent can drag the
+                // baseline at most one band-width (~0.04) before escaping,
+                // while rep depth is several times larger.
                 standingHipY = standingHipY * 0.98 + hipY * 0.02
             }
 
