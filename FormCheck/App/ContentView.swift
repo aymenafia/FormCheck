@@ -4,37 +4,18 @@ struct ContentView: View {
     @StateObject private var session = SessionViewModel()
     @StateObject private var store = EntitlementStore()
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-    @AppStorage("debug.bypassPaywall") private var bypassPaywall = false
     @AppStorage(SettingsKeys.appearance) private var appearance = "dark"
 
-    /// The dev bypass must not exist in Release builds — the UserDefaults key
-    /// would otherwise unlock the app via backup editing.
-    private var paywallBypassed: Bool {
-        #if DEBUG
-        return bypassPaywall
-        #else
-        return false
-        #endif
-    }
+    #if DEBUG
+    // Dev-only paywall bypass. The property and its key exist only in Debug,
+    // so nothing about it — not even the string — is in the shipped binary.
+    @AppStorage("debug.bypassPaywall") private var bypassPaywall = false
+    private var paywallBypassed: Bool { bypassPaywall }
+    #else
+    private var paywallBypassed: Bool { false }
+    #endif
 
     var body: some View {
-        Group {
-            #if DEBUG
-            if UserDefaults.standard.string(forKey: "debug.screen") == "history" {
-                // Marketing-screenshot deep link into History (seeded data).
-                HistoryView()
-            } else {
-                mainFlow
-            }
-            #else
-            mainFlow
-            #endif
-        }
-        .preferredColorScheme(Appearance.colorScheme(for: appearance))
-    }
-
-    @ViewBuilder
-    private var mainFlow: some View {
         Group {
             if !hasCompletedOnboarding {
                 OnboardingView { hasCompletedOnboarding = true }
@@ -54,6 +35,7 @@ struct ContentView: View {
                 }
             }
         }
+        .preferredColorScheme(Appearance.colorScheme(for: appearance))
     }
 }
 

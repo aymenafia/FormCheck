@@ -64,24 +64,9 @@ struct PaywallView: View {
         }
     }
 
-    /// Representative cards for App Store review screenshots when StoreKit
-    /// products can't load (e.g. simctl launch). Debug builds only.
-    private var demoPaywall: Bool {
-        #if DEBUG
-        return UserDefaults.standard.bool(forKey: "debug.demoPaywall")
-        #else
-        return false
-        #endif
-    }
-
     private var planCards: some View {
         VStack(spacing: 12) {
-            if demoPaywall {
-                planCard(id: "y", title: "Yearly", price: "$39.99 / year",
-                         detail: "That's $0.77 a week", badge: "BEST VALUE · SAVE 89%")
-                planCard(id: "w", title: "Weekly", price: "$6.99 / week",
-                         detail: "3-day free trial, cancel anytime", badge: nil)
-            } else if store.products.isEmpty {
+            if store.products.isEmpty {
                 if store.isLoadingProducts {
                     ProgressView("Loading plans…")
                         .padding(.vertical, 24)
