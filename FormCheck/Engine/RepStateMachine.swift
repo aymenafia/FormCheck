@@ -39,9 +39,22 @@ struct RepMetrics {
     let maxBarDriftRatio: CGFloat?
     /// Deadlift only: torso lean at the lockout frame.
     let lockoutLeanDegrees: Double?
+    /// Standing body span (head→ankle) at calibration, for size-normalizing.
+    let bodySpan: CGFloat?
+    /// Overhead press: elbow extension at the top of the rep (180° = locked out).
+    let elbowAtTopDegrees: Double?
+    /// Overhead press: wrist height minus nose height at the top (negative when
+    /// wrists are above the head — a proper overhead lockout).
+    let wristAboveHeadAtTop: CGFloat?
 
     var eccentricDuration: TimeInterval { bottomTime - startTime }
     var concentricDuration: TimeInterval { endTime - bottomTime }
+
+    /// Lunge/squat depth as a fraction of body span (how far the hips dropped).
+    var depthDrop: CGFloat? {
+        guard let bodySpan, bodySpan > 0 else { return nil }
+        return abs(bottomY - baselineY) / bodySpan
+    }
 
     /// Whether the knee was confidently tracked at the bottom, so depth is
     /// actually known. If false, we must NOT accuse the lifter of a shallow
@@ -91,8 +104,15 @@ final class RepStateMachine {
     private var bottomShoulderY: CGFloat?
     private var minEarlyShoulderHipRatio: CGFloat?
     private var maxBarDrift: CGFloat?
+    private var elbowAtTop: Double?
+    private var wristAboveHeadAtTop: CGFloat?
     private var lastTrackedY: CGFloat?
     private var outlierStreak = 0
+
+    /// +1 for down-first lifts (squat/deadlift/lunge), −1 for up-first (press).
+    /// All rep-detection deltas are multiplied by this, so for down-first the
+    /// math is byte-identical to the original single-direction machine.
+    private var dir: CGFloat { exercise.repDirection == .up ? -1 : 1 }
 
     func reset() {
         setPhase(.calibrating)
@@ -100,6 +120,8 @@ final class RepStateMachine {
         calibrationSamples = []
         standingHipY = 0
         standingBodySpan = nil
+        elbowAtTop = nil
+        wristAboveHeadAtTop = nil
         lastTrackedY = nil
         outlierStreak = 0
     }
@@ -149,12 +171,11 @@ final class RepStateMachine {
 
         switch phase {
         case .calibrating:
-            // Bench: only calibrate the lockout height while the arms are
-            // actually extended, so racked/unracking positions don't pollute
-            // it. Missing elbow data must NOT block — occluded elbows would
-            // otherwise leave the user stuck at "Hold still…" forever; the
-            // stillness gate below still protects the baseline.
-            if exercise.tracksWrists,
+            // Bench only: calibrate the lockout height while the arms are
+            // actually extended (racked/unracking positions must not pollute
+            // it). Overhead press calibrates at the racked/shoulder start, so
+            // it must NOT require extended arms.
+            if exercise == .bench,
                let elbow = frame.maxElbowExtensionDegrees, elbow < 150 {
                 break
             }
@@ -176,7 +197,9 @@ final class RepStateMachine {
             }
 
         case .standing:
-            if hipY > standingHipY + descentThreshold {
+            // `dir` flips the sense for up-first lifts (press). For down-first
+            // (dir=1) every line below is identical to the original.
+            if (hipY - standingHipY) * dir > descentThreshold {
                 repStartTime = frame.timestamp
                 bottomTime = frame.timestamp
                 bottomHipY = hipY
@@ -187,6 +210,7 @@ final class RepStateMachine {
                 bottomShoulderY = frame.shoulderCenter?.y
                 minEarlyShoulderHipRatio = nil
                 maxBarDrift = nil
+                captureTopIfNeeded(frame)
                 setPhase(.descending)
             } else if abs(hipY - standingHipY) < descentThreshold * 0.8 {
                 // Track slow drift (stance shifts, camera settling) — but only
@@ -199,24 +223,26 @@ final class RepStateMachine {
             }
 
         case .descending:
-            if hipY >= bottomHipY {
+            if hipY * dir >= bottomHipY * dir {
                 bottomHipY = hipY
                 bottomTime = frame.timestamp
                 kneeYAtBottom = frame.mostConfidentKneeY
                 bottomShoulderY = frame.shoulderCenter?.y
-            } else if bottomHipY - hipY > turnaroundThreshold {
+                captureTopIfNeeded(frame)
+            } else if (bottomHipY - hipY) * dir > turnaroundThreshold {
                 setPhase(.ascending)
             }
 
         case .ascending:
-            if hipY > bottomHipY {
-                // Went back down past the previous bottom — still the same rep.
+            if hipY * dir > bottomHipY * dir {
+                // Went back past the previous extreme — still the same rep.
                 bottomHipY = hipY
                 bottomTime = frame.timestamp
                 kneeYAtBottom = frame.mostConfidentKneeY
                 bottomShoulderY = frame.shoulderCenter?.y
+                captureTopIfNeeded(frame)
                 setPhase(.descending)
-            } else if hipY < standingHipY + lockoutThreshold {
+            } else if (hipY - standingHipY) * dir < lockoutThreshold {
                 repCount += 1
                 let metrics = RepMetrics(
                     index: repCount,
@@ -235,11 +261,25 @@ final class RepStateMachine {
                     maxLateralShiftRatio: maxLateralShift,
                     earlyShoulderHipRatio: minEarlyShoulderHipRatio,
                     maxBarDriftRatio: maxBarDrift,
-                    lockoutLeanDegrees: frame.torsoLeanDegrees
+                    lockoutLeanDegrees: frame.torsoLeanDegrees,
+                    bodySpan: standingBodySpan,
+                    elbowAtTopDegrees: elbowAtTop,
+                    wristAboveHeadAtTop: wristAboveHeadAtTop
                 )
                 setPhase(.standing)
                 onRepCompleted?(metrics)
             }
+        }
+    }
+
+    /// Overhead press: capture elbow extension and wrist-vs-head at the top of
+    /// the rep (the extreme point), for lockout scoring.
+    private func captureTopIfNeeded(_ frame: PoseFrame) {
+        guard exercise == .overheadPress else { return }
+        elbowAtTop = frame.maxElbowExtensionDegrees
+        if let wrist = frame.wristCenter,
+           let head = (frame.joints[.nose] ?? frame.joints[.neck])?.location {
+            wristAboveHeadAtTop = wrist.y - head.y // negative = wrists above head
         }
     }
 

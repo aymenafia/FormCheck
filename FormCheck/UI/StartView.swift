@@ -81,7 +81,7 @@ struct StartView: View {
             VStack(spacing: 16) {
                 Picker("Exercise", selection: $exercise) {
                     ForEach(Exercise.available) { exercise in
-                        Text(exercise.rawValue).tag(exercise)
+                        Text(exercise.pickerLabel).tag(exercise)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -123,6 +123,14 @@ struct StartView: View {
                         SetupStep(number: 1, text: "Prop your phone at knee height, side-on")
                         SetupStep(number: 2, text: "Stand at the bar, ~2.5 m (8 ft) away, fully in frame")
                         SetupStep(number: 3, text: "Checks hip timing, bar path & lockout")
+                    case (.overheadPress, _):
+                        SetupStep(number: 1, text: "Prop your phone at waist height, side-on")
+                        SetupStep(number: 2, text: "Stand ~2.5 m (8 ft) away, whole body & bar in frame")
+                        SetupStep(number: 3, text: "Hold the bar at your shoulders to calibrate, then press")
+                    case (.lunge, _):
+                        SetupStep(number: 1, text: "Prop your phone at knee height, side-on")
+                        SetupStep(number: 2, text: "Stand ~2.5 m (8 ft) away, fully in frame")
+                        SetupStep(number: 3, text: "Checks depth & upright torso")
                     case (.bench, _):
                         SetupStep(number: 1, text: "Turn your phone sideways (landscape) at chest height, side-on to the bench")
                         SetupStep(number: 2, text: "Whole bench in frame, ~2.5 m (8 ft) away")

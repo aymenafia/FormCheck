@@ -17,6 +17,11 @@ enum FormFault: String, CaseIterable, Identifiable, Hashable {
     case benchPartialRep = "Didn't touch the chest"
     case barBounce = "Bouncing off the chest"
     case benchSoftLockout = "Didn't lock out"
+    // Overhead press
+    case pressNotOverhead = "Didn't press fully overhead"
+    case pressLeanBack = "Leaning back too much"
+    // Lunge
+    case lungeShallow = "Not deep enough"
 
     var id: String { rawValue }
 
@@ -44,6 +49,9 @@ enum FormFault: String, CaseIterable, Identifiable, Hashable {
         case .benchPartialRep: return "Bring it all the way down."
         case .barBounce: return "Touch and press. Don't bounce."
         case .benchSoftLockout: return "Full lockout at the top."
+        case .pressNotOverhead: return "All the way overhead."
+        case .pressLeanBack: return "Stop leaning back."
+        case .lungeShallow: return "Drop your back knee lower."
         }
     }
 }
@@ -126,14 +134,58 @@ struct FormRuleEngine {
                                                  // thickness + bar radius) — tune on real footage.
     var benchMinEccentricSeconds: TimeInterval = 0.4
     var benchLockoutAngleLimit: Double = 155     // elbow angle at the top; 180° = straight
+    // Overhead press
+    var pressLockoutAngleLimit: Double = 150     // elbow angle at the top
+    var pressLeanBackLimit: Double = 20          // torso lean back at any point
+    // Lunge
+    var lungeDepthLimit: CGFloat = 0.14          // hip must drop ≥14% of body span
 
     func score(_ metrics: RepMetrics) -> RepScore {
         switch metrics.exercise {
         case .squat: return squatScore(metrics)
         case .deadlift: return deadliftScore(metrics)
         case .bench: return benchScore(metrics)
+        case .overheadPress: return pressScore(metrics)
+        case .lunge: return lungeScore(metrics)
         case .freestyle: return repScore(metrics, score: 0, faults: []) // never scored
         }
+    }
+
+    /// Overhead press: reward a full lockout (elbows straight, bar overhead)
+    /// and penalize turning it into a lean-back push press.
+    private func pressScore(_ metrics: RepMetrics) -> RepScore {
+        var faults: [FormFault] = []
+        var score = 100
+
+        // Lockout: only flag if we actually measured the top and it's short —
+        // never accuse on missing data.
+        let elbowShort = (metrics.elbowAtTopDegrees.map { $0 < pressLockoutAngleLimit }) ?? false
+        let notOverhead = (metrics.wristAboveHeadAtTop.map { $0 > 0 }) ?? false // wrists not above head
+        if elbowShort || (metrics.elbowAtTopDegrees != nil && notOverhead) {
+            faults.append(.pressNotOverhead)
+            score -= 30
+        }
+        if metrics.maxTorsoLeanDegrees > pressLeanBackLimit {
+            faults.append(.pressLeanBack)
+            score -= 20
+        }
+        return repScore(metrics, score: score, faults: faults)
+    }
+
+    /// Lunge: depth (did the hips drop far enough) and an upright torso.
+    private func lungeScore(_ metrics: RepMetrics) -> RepScore {
+        var faults: [FormFault] = []
+        var score = 100
+
+        if let drop = metrics.depthDrop, drop < lungeDepthLimit {
+            faults.append(.lungeShallow)
+            score -= 35
+        }
+        if metrics.maxTorsoLeanDegrees > leanLimitDegrees {
+            faults.append(.excessiveLean)
+            score -= 20
+        }
+        return repScore(metrics, score: score, faults: faults)
     }
 
     private func squatScore(_ metrics: RepMetrics) -> RepScore {

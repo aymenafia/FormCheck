@@ -4,6 +4,8 @@
 enum Exercise: String, CaseIterable, Identifiable {
     case squat = "Squat"
     case deadlift = "Deadlift"
+    case overheadPress = "Overhead Press"
+    case lunge = "Lunge"
     case bench = "Bench"
     /// Not a scored lift: shows the live skeleton and records a shareable clip
     /// with the skeleton burned in. No form scoring — that would need a
@@ -12,18 +14,24 @@ enum Exercise: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// Modes offered in the UI. v1 ships the two reliable lifts only.
-    /// Bench is withheld (a lying body is where on-device pose estimation is
-    /// least reliable). Freestyle is withheld too — kept focused for launch;
-    /// both are one line away from returning once validated/tuned.
-    static var available: [Exercise] { [.squat, .deadlift] }
+    /// Short label for the segmented picker (four segments get cramped).
+    var pickerLabel: String { self == .overheadPress ? "Press" : rawValue }
+
+    /// Modes offered in the UI. All four here are upright/standing movements
+    /// where on-device pose estimation is reliable. Bench (lying body) and
+    /// Freestyle are withheld — both one line from returning.
+    static var available: [Exercise] { [.squat, .deadlift, .overheadPress, .lunge] }
 
     var isFreestyle: Bool { self == .freestyle }
 
-    /// Only squat: deadlift hides valgus behind the bar, and bench is
-    /// side-view by geometry (the rack blocks a front camera anyway).
+    /// Front view adds value only for squat (knee valgus). The rest read best side-on.
     var supportsFrontView: Bool { self == .squat }
 
-    /// Bench tracks the bar via the wrists; everything else tracks the hips.
-    var tracksWrists: Bool { self == .bench }
+    /// Bench and overhead press track the bar via the wrists; the rest track the hips.
+    var tracksWrists: Bool { self == .bench || self == .overheadPress }
+
+    /// Which way the tracked joint moves first in a rep. Squat/deadlift/lunge
+    /// drop then rise (down-first). Overhead press goes up then down (up-first).
+    enum RepDirection { case down, up }
+    var repDirection: RepDirection { self == .overheadPress ? .up : .down }
 }
