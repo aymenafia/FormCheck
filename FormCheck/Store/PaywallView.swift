@@ -157,7 +157,7 @@ struct PaywallView: View {
                     Task { await store.restorePurchases() }
                 }
                 Link("Terms", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
-                Link("Privacy", destination: URL(string: "https://example.com/privacy")!)
+                Link("Privacy", destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md")!)
                 #if DEBUG
                 Button("Skip (dev)") {
                     UserDefaults.standard.set(true, forKey: "debug.bypassPaywall")

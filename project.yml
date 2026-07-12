@@ -13,18 +13,27 @@ targets:
     platform: iOS
     sources:
       - FormCheck
+    info:
+      path: FormCheck/Info.plist
+      properties:
+        # On-device only, no proprietary crypto — skips the export-compliance
+        # question on every App Store Connect upload.
+        ITSAppUsesNonExemptEncryption: false
+        # Keep version single-sourced from build settings.
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.formcheck.app
-        GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_NSCameraUsageDescription: "FormCheck uses the camera to analyze your lifting form in real time. Video is processed on-device and never leaves your phone."
         INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "FormCheck saves your exported rep replays to your photo library when you choose to."
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 64BD3MXBAX
         CURRENT_PROJECT_VERSION: 1
-        MARKETING_VERSION: 0.1.0
+        MARKETING_VERSION: 1.0.0
 schemes:
   FormCheck:
     build:

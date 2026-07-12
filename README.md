@@ -60,3 +60,24 @@ Before shipping: create the same product IDs (`formcheck.weekly` $6.99/wk with 3
 6. ~~Bench mode~~ ✅ — rep detector tracks wrist (bar) height instead of hips; calibration only samples while elbows are extended (holding lockout). Faults: didn't touch chest, bouncing, soft lockout (elbow angle). Lying-body placement guide.
 
 The MVP spec is fully built. What's left is tuning on real footage — every threshold in the table above is an educated guess until it has survived a real gym.
+
+## Ship checklist
+
+**Done in the repo** (nothing to do):
+- ✅ Privacy policy: [PRIVACY.md](PRIVACY.md), linked from the paywall and Settings
+- ✅ Privacy manifest (`PrivacyInfo.xcprivacy`): no tracking, no data collection, UserDefaults declared (reason CA92.1)
+- ✅ Export compliance: `ITSAppUsesNonExemptEncryption = false` in Info.plist
+- ✅ Signing: automatic, team `64BD3MXBAX`; version 1.0.0; app icon; launch screen
+
+**To do in App Store Connect** (only the account holder can):
+1. Create the app (bundle ID `com.formcheck.app`).
+2. Subscriptions → group "FormCheck Pro" → two auto-renewables matching `Products.storekit` exactly:
+   - `formcheck.weekly` — $6.99/week, **3-day free trial** introductory offer
+   - `formcheck.yearly` — $39.99/year
+3. App Privacy questionnaire: **"Data Not Collected"** across the board (true — see PRIVACY.md).
+4. Privacy Policy URL: `https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md` (repo must stay public).
+5. Age rating questionnaire (all "None" → 4+), category: Health & Fitness.
+6. Screenshots: capture on device — the live skeleton + bar path is the money shot; X-ray export frames work great too.
+7. Archive in Xcode (Product → Archive) → Distribute → App Store Connect. First build goes to TestFlight.
+
+**Review notes tip:** in "Notes for Review", tell Apple the camera requirement: "Requires a camera pointed at a person exercising; all processing is on-device." Attach a short demo video link if asked.

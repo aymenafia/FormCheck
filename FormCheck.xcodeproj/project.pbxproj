@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -38,6 +38,7 @@
 		B50E51D99F3A96A93BD15C9E /* PlacementChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D062A3CE0F7D844A53A6A2 /* PlacementChecker.swift */; };
 		BB6057D04B5DD02E29D3D94F /* PoseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 566B32AEF7981D5A1A61CA51 /* PoseModels.swift */; };
 		C2626260B408914A2B9BE7CA /* SkeletonOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B856D5FAEF96132746DC9A /* SkeletonOverlayView.swift */; };
+		C394465435089FAE270F7DE8 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 4AFD0F9D59B47854922DBC6D /* PrivacyInfo.xcprivacy */; };
 		CAEA4F5025E9C6E3B2CE0258 /* SetSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0287B82BFA9E9A0EA805B75 /* SetSummaryView.swift */; };
 		CB84A356B189616B14596431 /* VisionPoseProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF0C73F025EAC260067A8E96 /* VisionPoseProvider.swift */; };
 		CC7D93F62884BE70CDD54C8C /* HistoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 244B8B81104E3D8BC6C8FF4F /* HistoryStore.swift */; };
@@ -52,18 +53,20 @@
 /* Begin PBXFileReference section */
 		108FA2A2B99A11885640E663 /* FormCheckApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormCheckApp.swift; sourceTree = "<group>"; };
 		135076EE8E6F21BFFE0A9173 /* HUDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDView.swift; sourceTree = "<group>"; };
+		13FB163D53CBCD3D7606DA06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		149777E9C9C3D88F373454AD /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
 		1BC44BC652F5B4C1B7CD8C88 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		23BBEF6D772419545844CD6F /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		244B8B81104E3D8BC6C8FF4F /* HistoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryStore.swift; sourceTree = "<group>"; };
 		252E78AE76DBB772177981E2 /* OverlayMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayMapping.swift; sourceTree = "<group>"; };
 		2BE2CD30DD5526F282BE4317 /* FormRuleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormRuleEngine.swift; sourceTree = "<group>"; };
-		302A348B0FE3CB6801FB09F4 /* FormCheck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FormCheck.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		302A348B0FE3CB6801FB09F4 /* FormCheck.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FormCheck.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BFBA042B7DE9B87E4F75416 /* CameraSide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSide.swift; sourceTree = "<group>"; };
 		3DEF47B671153D3BDF539EB0 /* PoseProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseProvider.swift; sourceTree = "<group>"; };
 		421D4DD857D602AE92ACAF89 /* LiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSessionView.swift; sourceTree = "<group>"; };
 		43B65CB06AF1662D27ACE475 /* EntitlementStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementStore.swift; sourceTree = "<group>"; };
 		460843CED336D0A891BD4D6D /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
+		4AFD0F9D59B47854922DBC6D /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		4FB9F118E8E9B831B2C2034D /* StartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartView.swift; sourceTree = "<group>"; };
 		54C0681E5900506698D64D73 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		566B32AEF7981D5A1A61CA51 /* PoseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseModels.swift; sourceTree = "<group>"; };
@@ -142,6 +145,8 @@
 			isa = PBXGroup;
 			children = (
 				54C0681E5900506698D64D73 /* Assets.xcassets */,
+				13FB163D53CBCD3D7606DA06 /* Info.plist */,
+				4AFD0F9D59B47854922DBC6D /* PrivacyInfo.xcprivacy */,
 				B6EA66D9CC8B4FB752013BE4 /* App */,
 				7E5DE22C73E99B782EA3D31F /* Camera */,
 				F856D89AD832725941BEABEE /* Engine */,
@@ -276,6 +281,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					8D11B6029CF5D5BBC1126A0F = {
+						DevelopmentTeam = 64BD3MXBAX;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -290,6 +296,7 @@
 			);
 			mainGroup = 3B75E1404C6D7BB7976FE397;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -304,6 +311,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E84C236A124F9E95CA7152E7 /* Assets.xcassets in Resources */,
+				C394465435089FAE270F7DE8 /* PrivacyInfo.xcprivacy in Resources */,
 				61EC8A425DFED5328ED14A78 /* ding.wav in Resources */,
 				B29279A111DD42D4730DECA4 /* sad-trombone.wav in Resources */,
 				3D66D0E2A90C144B5DA8538A /* victory.wav in Resources */,
@@ -486,7 +494,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 64BD3MXBAX;
-				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FormCheck/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "FormCheck uses the camera to analyze your lifting form in real time. Video is processed on-device and never leaves your phone.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "FormCheck saves your exported rep replays to your photo library when you choose to.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -495,7 +503,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.formcheck.app;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -510,7 +518,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 64BD3MXBAX;
-				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FormCheck/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "FormCheck uses the camera to analyze your lifting form in real time. Video is processed on-device and never leaves your phone.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "FormCheck saves your exported rep replays to your photo library when you choose to.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -519,7 +527,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.formcheck.app;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;

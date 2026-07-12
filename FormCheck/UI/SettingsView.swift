@@ -62,7 +62,7 @@ struct SettingsView: View {
                     Link("Manage Subscription",
                          destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
                     Link("Privacy Policy",
-                         destination: URL(string: "https://example.com/privacy")!)
+                         destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md")!)
                     Link("Terms of Use",
                          destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
                 }
