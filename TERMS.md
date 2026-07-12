@@ -32,7 +32,7 @@ Don't use FormCheck to record people without their consent, and comply with your
 
 ## 5. Privacy
 
-FormCheck collects no data. See the [Privacy Policy](PRIVACY.md).
+FormCheck collects no personal data — only an anonymous install count. See the [Privacy Policy](PRIVACY.md).
 
 ## 6. Changes
 

@@ -74,7 +74,7 @@ The MVP spec is fully built. What's left is tuning on real footage — every thr
 2. Subscriptions → group "FormCheck Pro" → two auto-renewables matching `Products.storekit` exactly:
    - `formcheck.weekly` — $6.99/week, **3-day free trial** introductory offer
    - `formcheck.yearly` — $39.99/year
-3. App Privacy questionnaire: **"Data Not Collected"** across the board (true — see PRIVACY.md).
+3. App Privacy questionnaire: **Usage Data → Product Interaction — collected, NOT linked to identity, NOT used for tracking** (the anonymous install ping); everything else "not collected". Matches PRIVACY.md. (If you ever disable `InstallPing.endpoint`, this reverts to "Data Not Collected".)
 4. Privacy Policy URL: `https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md` (repo must stay public).
    Support URL: `https://github.com/aymenafia/FormCheck/blob/main/SUPPORT.md`
    Also paste the Terms link into the **App Description** (required for subscription apps): `https://github.com/aymenafia/FormCheck/blob/main/TERMS.md`

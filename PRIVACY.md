@@ -6,7 +6,9 @@ FormCheck is built so that your data never leaves your device. This policy is sh
 
 ## What we collect
 
-**Nothing.** FormCheck has no servers, no accounts, no analytics, and no third-party SDKs. We do not collect, transmit, store, sell, or share any personal data.
+**One anonymous install signal — and nothing else.** The first time the app is opened, it sends a single message that says, in effect, "someone installed the app." It contains no identifiers, no device information, no location, and nothing about you or your workouts — we can count installs, and that is all. It is sent once per install and is not linked to you in any way.
+
+Beyond that: FormCheck has no accounts, no analytics SDKs, and no advertising or tracking of any kind. We do not collect, store, sell, or share any personal data. Your workouts, your video, and your history never leave your phone (see below).
 
 ## Camera and video
 
@@ -22,13 +24,17 @@ Your set history (dates, exercises, scores) is stored locally on your device in 
 
 Subscriptions are processed by Apple through the App Store. We never see your payment details. Purchase receipts are validated on-device by Apple's StoreKit framework.
 
+## Subscription events
+
+When you subscribe, Apple notifies us of subscription lifecycle events (for example, "a trial started" or "a subscription renewed") through Apple's own App Store Server Notifications. These come from Apple's servers, not from your device, and identify the transaction — not you.
+
 ## Tracking
 
 FormCheck does not track you, does not use advertising identifiers, and contains no advertising.
 
 ## Children
 
-FormCheck does not knowingly collect any data from anyone, including children, because it collects no data at all.
+FormCheck does not knowingly collect personal data from anyone, including children.
 
 ## Changes
 
