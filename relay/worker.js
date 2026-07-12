@@ -21,6 +21,21 @@ export default {
       return new Response("test sent");
     }
 
+    // First-launch pings from the app itself. Separate secret on purpose:
+    // this URL ships inside the app binary and is extractable — it must never
+    // be able to forge purchase events.
+    if (
+      request.method === "POST" &&
+      env.INSTALL_SECRET &&
+      url.pathname === `/install/${env.INSTALL_SECRET}`
+    ) {
+      const envTag = url.searchParams.get("env");
+      const tag =
+        envTag === "beta" ? "  [TESTFLIGHT]" : envTag === "dev" ? "  [DEV]" : "";
+      await notify(env, `📲 New install (first launch)${tag}`);
+      return new Response("ok");
+    }
+
     if (request.method !== "POST" || url.pathname !== `/apple/${env.RELAY_SECRET}`) {
       return new Response("not found", { status: 404 });
     }

@@ -32,6 +32,7 @@
 		8C7A925A12687804AF0CC2C4 /* FormRuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE2CD30DD5526F282BE4317 /* FormRuleEngine.swift */; };
 		8D41F2455A86C84CA3908C6E /* RepEffectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EFD0FD325D7F1C0156EC9 /* RepEffectsView.swift */; };
 		8E46EA34D877A37650CD17A5 /* ReplayExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDD8DE2E6BDD630C7AFE14D5 /* ReplayExporter.swift */; };
+		9FCE8D2927E4320730FC4150 /* InstallPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF0983690A99F37956D21F4 /* InstallPing.swift */; };
 		A2FDAC58EA6853029D38C543 /* EntitlementStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B65CB06AF1662D27ACE475 /* EntitlementStore.swift */; };
 		A64D81749F8B1711FD18C8E8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08270E53D717331B556A15A /* OnboardingView.swift */; };
 		B29279A111DD42D4730DECA4 /* sad-trombone.wav in Resources */ = {isa = PBXBuildFile; fileRef = F0F7119BBD501CC22C5D42CF /* sad-trombone.wav */; };
@@ -82,6 +83,7 @@
 		8E683F918D273BD7DFCA137C /* SessionRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRecorder.swift; sourceTree = "<group>"; };
 		913EFD0FD325D7F1C0156EC9 /* RepEffectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepEffectsView.swift; sourceTree = "<group>"; };
 		A962274B5BE4A3A26C7E2335 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BFF0983690A99F37956D21F4 /* InstallPing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallPing.swift; sourceTree = "<group>"; };
 		C481C5ABC2CC78A59C032D6D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C9D062A3CE0F7D844A53A6A2 /* PlacementChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacementChecker.swift; sourceTree = "<group>"; };
 		CE34A3BF3CC69D55C07106D3 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 			children = (
 				A962274B5BE4A3A26C7E2335 /* ContentView.swift */,
 				108FA2A2B99A11885640E663 /* FormCheckApp.swift */,
+				BFF0983690A99F37956D21F4 /* InstallPing.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				14E6E9D7FFBCE226CFECACE8 /* HUDView.swift in Sources */,
 				CC7D93F62884BE70CDD54C8C /* HistoryStore.swift in Sources */,
 				1203C815BB8F57341D75B67C /* HistoryView.swift in Sources */,
+				9FCE8D2927E4320730FC4150 /* InstallPing.swift in Sources */,
 				4DE783426AB2EB40AFB71F54 /* LiveSessionView.swift in Sources */,
 				A64D81749F8B1711FD18C8E8 /* OnboardingView.swift in Sources */,
 				0D60A770A1F57BBB3D7B3510 /* OneEuroFilter.swift in Sources */,

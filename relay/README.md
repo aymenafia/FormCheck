@@ -57,6 +57,28 @@ Cloudflare Worker (free tier)
    Then use ASC's **Request Test Notification** — you should receive
    "🔔 Apple test notification received".
 
+## Optional: install pings (📲)
+
+Apple never emits download events, so "someone installed" can only come from
+the app itself — a bare, identifier-free POST on first launch. To enable:
+
+1. Add a second secret (deliberately separate — this URL ships inside the app
+   binary and must never be able to forge purchase pings):
+   ```sh
+   openssl rand -hex 24 | wrangler secret put INSTALL_SECRET
+   wrangler deploy
+   ```
+2. In the app, set `InstallPing.endpoint` (`FormCheck/App/InstallPing.swift`) to
+   `https://formcheck-relay.<you>.workers.dev/install/<INSTALL_SECRET>` and rebuild.
+
+TestFlight installs arrive tagged `[TESTFLIGHT]`, debug builds `[DEV]`.
+
+**Privacy trade-off:** the ping carries no identifiers and no device info, but
+it is still the app transmitting usage data. With it enabled, answer the App
+Privacy questionnaire with **Usage Data → Product Interaction — not linked to
+identity, no tracking** instead of "Data Not Collected", and add a line to
+PRIVACY.md. Leave `endpoint` nil to skip all of this and keep the perfect label.
+
 ## Events you'll see
 
 | Ping | Meaning |
