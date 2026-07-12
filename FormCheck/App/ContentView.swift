@@ -19,6 +19,23 @@ struct ContentView: View {
 
     var body: some View {
         Group {
+            #if DEBUG
+            if UserDefaults.standard.string(forKey: "debug.screen") == "history" {
+                // Marketing-screenshot deep link into History (seeded data).
+                HistoryView()
+            } else {
+                mainFlow
+            }
+            #else
+            mainFlow
+            #endif
+        }
+        .preferredColorScheme(Appearance.colorScheme(for: appearance))
+    }
+
+    @ViewBuilder
+    private var mainFlow: some View {
+        Group {
             if !hasCompletedOnboarding {
                 OnboardingView { hasCompletedOnboarding = true }
             } else if session.isActive {
@@ -37,7 +54,6 @@ struct ContentView: View {
                 }
             }
         }
-        .preferredColorScheme(Appearance.colorScheme(for: appearance))
     }
 }
 
