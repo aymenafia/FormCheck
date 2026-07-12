@@ -12,10 +12,11 @@ enum Exercise: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    /// Modes offered in the UI. Bench is withheld from v1 — a lying body is
-    /// where on-device pose estimation is least reliable (Vision is trained
-    /// mostly on upright people). Re-add `.bench` once tuned against footage.
-    static var available: [Exercise] { [.squat, .deadlift, .freestyle] }
+    /// Modes offered in the UI. v1 ships the two reliable lifts only.
+    /// Bench is withheld (a lying body is where on-device pose estimation is
+    /// least reliable). Freestyle is withheld too — kept focused for launch;
+    /// both are one line away from returning once validated/tuned.
+    static var available: [Exercise] { [.squat, .deadlift] }
 
     var isFreestyle: Bool { self == .freestyle }
 
