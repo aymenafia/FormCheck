@@ -152,11 +152,17 @@ struct PaywallView: View {
             .tint(.green)
             .disabled(isPurchasing || store.products.isEmpty)
 
+            // Guideline 3.1.2: auto-renew disclosure at the point of purchase.
+            Text("Subscriptions renew automatically until cancelled. Cancel anytime in Settings → Apple Account → Subscriptions.")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+
             HStack(spacing: 16) {
                 Button("Restore Purchases") {
                     Task { await store.restorePurchases() }
                 }
-                Link("Terms", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                Link("Terms", destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/TERMS.md")!)
                 Link("Privacy", destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md")!)
                 #if DEBUG
                 Button("Skip (dev)") {
