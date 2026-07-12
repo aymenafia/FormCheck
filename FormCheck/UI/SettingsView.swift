@@ -60,9 +60,9 @@ struct SettingsView: View {
 
                 Section("Support") {
                     Link("Help & FAQ",
-                         destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/SUPPORT.md")!)
+                         destination: URL(string: "https://formcheck.aymenafia.workers.dev/support")!)
                     Link("Report a Problem",
-                         destination: URL(string: "https://github.com/aymenafia/FormCheck/issues")!)
+                         destination: URL(string: "mailto:afia.med.aymen@gmail.com?subject=FormCheck%20Bug%20Report")!)
                     Link("Email Support",
                          destination: URL(string: "mailto:afia.med.aymen@gmail.com?subject=FormCheck%20Support")!)
                 }
@@ -71,9 +71,9 @@ struct SettingsView: View {
                     Link("Manage Subscription",
                          destination: URL(string: "https://apps.apple.com/account/subscriptions")!)
                     Link("Privacy Policy",
-                         destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md")!)
+                         destination: URL(string: "https://formcheck.aymenafia.workers.dev/privacy")!)
                     Link("Terms of Use",
-                         destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/TERMS.md")!)
+                         destination: URL(string: "https://formcheck.aymenafia.workers.dev/terms")!)
                 }
 
                 Section {

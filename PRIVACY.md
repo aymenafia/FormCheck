@@ -42,4 +42,4 @@ If this policy ever changes, the update will appear on this page with a new date
 
 ## Contact
 
-Questions: open an issue at https://github.com/aymenafia/FormCheck/issues
+Questions: email afia.med.aymen@gmail.com

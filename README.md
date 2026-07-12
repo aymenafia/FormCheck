@@ -75,9 +75,9 @@ The MVP spec is fully built. What's left is tuning on real footage — every thr
    - `formcheck.weekly` — $6.99/week, **3-day free trial** introductory offer
    - `formcheck.yearly` — $39.99/year
 3. App Privacy questionnaire: **Usage Data → Product Interaction — collected, NOT linked to identity, NOT used for tracking** (the anonymous install ping); everything else "not collected". Matches PRIVACY.md. (If you ever disable `InstallPing.endpoint`, this reverts to "Data Not Collected".)
-4. Privacy Policy URL: `https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md` (repo must stay public).
-   Support URL: `https://github.com/aymenafia/FormCheck/blob/main/SUPPORT.md`
-   Also paste the Terms link into the **App Description** (required for subscription apps): `https://github.com/aymenafia/FormCheck/blob/main/TERMS.md`
+4. Privacy Policy URL: `https://formcheck.aymenafia.workers.dev/privacy` (hosted on Cloudflare — repo can be private).
+   Support URL: `https://formcheck.aymenafia.workers.dev/support`
+   Also paste the Terms link into the **App Description** (required for subscription apps): `https://formcheck.aymenafia.workers.dev/terms`
 5. Age rating questionnaire (all "None" → 4+), category: Health & Fitness.
 6. Screenshots: capture on device — the live skeleton + bar path is the money shot; X-ray export frames work great too.
 7. Optional but great: deploy the real-time payment-ping relay ([relay/README.md](relay/README.md)), then set its URL under App Information → App Store Server Notifications (V2, Production + Sandbox).

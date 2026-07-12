@@ -24,11 +24,10 @@ iPhone Settings → your name → Subscriptions → FormCheck. Deleting the app 
 Purchases are handled by Apple. Request a refund at https://reportaproblem.apple.com
 
 **Where is my data?**
-On your phone, and nowhere else. FormCheck has no servers and collects nothing — see the [Privacy Policy](PRIVACY.md).
+On your phone, and nowhere else. FormCheck has no servers and collects only an anonymous install count — see the [Privacy Policy](https://formcheck.aymenafia.workers.dev/privacy).
 
 ## Still stuck?
 
-- **Report a bug / ask a question:** open an issue at https://github.com/aymenafia/FormCheck/issues
-- **Email:** afia.med.aymen@gmail.com
+- **Email support:** afia.med.aymen@gmail.com
 
 Please include your iPhone model, iOS version, and which exercise/camera view you were using — it makes fixes much faster.

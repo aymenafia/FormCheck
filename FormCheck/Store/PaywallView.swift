@@ -251,8 +251,8 @@ struct PaywallView: View {
 
             HStack(spacing: 16) {
                 Button("Restore") { Task { await store.restorePurchases() } }
-                Link("Terms", destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/TERMS.md")!)
-                Link("Privacy", destination: URL(string: "https://github.com/aymenafia/FormCheck/blob/main/PRIVACY.md")!)
+                Link("Terms", destination: URL(string: "https://formcheck.aymenafia.workers.dev/terms")!)
+                Link("Privacy", destination: URL(string: "https://formcheck.aymenafia.workers.dev/privacy")!)
                 #if DEBUG
                 Button("Skip (dev)") {
                     UserDefaults.standard.set(true, forKey: "debug.bypassPaywall")

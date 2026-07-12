@@ -32,7 +32,7 @@ Don't use FormCheck to record people without their consent, and comply with your
 
 ## 5. Privacy
 
-FormCheck collects no personal data — only an anonymous install count. See the [Privacy Policy](PRIVACY.md).
+FormCheck collects no personal data — only an anonymous install count. See the [Privacy Policy](https://formcheck.aymenafia.workers.dev/privacy).
 
 ## 6. Changes
 
@@ -40,4 +40,4 @@ We may update these terms; changes appear on this page with a new date. Continue
 
 ## 7. Contact
 
-Questions: open an issue at https://github.com/aymenafia/FormCheck/issues
+Questions: email afia.med.aymen@gmail.com
