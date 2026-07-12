@@ -49,8 +49,10 @@ final class FeedbackManager: ObservableObject {
     }()
 
     init() {
-        // Duck the user's gym music instead of stopping it.
-        try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.mixWithOthers, .duckOthers])
+        // Mix over the user's gym music. Deliberately NOT .duckOthers: iOS
+        // ducks for as long as the session is active, which would leave their
+        // music quiet for the entire workout, not just during callouts.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
     }
 

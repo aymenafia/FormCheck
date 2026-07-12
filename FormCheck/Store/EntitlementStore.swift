@@ -11,6 +11,9 @@ final class EntitlementStore: ObservableObject {
     static let productIDs: Set<String> = [weeklyID, yearlyID]
 
     @Published private(set) var isSubscribed = false
+    /// False until the first entitlement check answers — lets the UI avoid
+    /// flashing the paywall at subscribers on cold launch.
+    @Published private(set) var entitlementsLoaded = false
     @Published private(set) var products: [Product] = []
     @Published private(set) var isLoadingProducts = false
     @Published var lastError: String?
@@ -21,10 +24,19 @@ final class EntitlementStore: ObservableObject {
     private var updatesTask: Task<Void, Never>?
 
     init() {
-        updatesTask = Task { await self.listenForTransactions() }
-        Task {
-            await self.refreshEntitlement()
-            await self.loadProducts()
+        updatesTask = Task { [weak self] in
+            for await update in Transaction.updates {
+                guard let self else { break }
+                if case .verified(let transaction) = update {
+                    await transaction.finish()
+                    await self.refreshEntitlement()
+                }
+            }
+        }
+        Task { [weak self] in
+            await self?.refreshEntitlement()
+            self?.entitlementsLoaded = true
+            await self?.loadProducts()
         }
     }
 
@@ -82,12 +94,4 @@ final class EntitlementStore: ObservableObject {
         isSubscribed = active
     }
 
-    private func listenForTransactions() async {
-        for await update in Transaction.updates {
-            if case .verified(let transaction) = update {
-                await transaction.finish()
-                await refreshEntitlement()
-            }
-        }
-    }
 }

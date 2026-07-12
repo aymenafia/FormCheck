@@ -55,6 +55,10 @@ final class HistoryStore: ObservableObject {
         .urls(for: .documentDirectory, in: .userDomainMask)[0]
         .appendingPathComponent("formcheck-history.json")
 
+    /// Serial queue so rapid save() calls can't interleave and persist a
+    /// stale snapshot over a newer one.
+    private let ioQueue = DispatchQueue(label: "formcheck.history.io", qos: .utility)
+
     init() {
         load()
     }
@@ -70,15 +74,23 @@ final class HistoryStore: ObservableObject {
     }
 
     private func load() {
-        guard let data = try? Data(contentsOf: fileURL),
-              let decoded = try? JSONDecoder().decode([SetRecord].self, from: data) else { return }
+        guard let data = try? Data(contentsOf: fileURL) else { return }
+        guard let decoded = try? JSONDecoder().decode([SetRecord].self, from: data) else {
+            // Never let the next save() silently overwrite history we failed
+            // to read — park the unreadable file for recovery.
+            let backup = fileURL.deletingLastPathComponent()
+                .appendingPathComponent("formcheck-history.unreadable.json")
+            try? FileManager.default.removeItem(at: backup)
+            try? FileManager.default.copyItem(at: fileURL, to: backup)
+            return
+        }
         records = decoded
     }
 
     private func save() {
         let snapshot = records
         let url = fileURL
-        DispatchQueue.global(qos: .utility).async {
+        ioQueue.async {
             guard let data = try? JSONEncoder().encode(snapshot) else { return }
             try? data.write(to: url, options: .atomic)
         }

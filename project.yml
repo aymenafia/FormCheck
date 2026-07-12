@@ -16,6 +16,15 @@ targets:
     info:
       path: FormCheck/Info.plist
       properties:
+        # IMPORTANT: with a custom Info.plist, INFOPLIST_KEY_* build settings
+        # are IGNORED — every key must live here.
+        NSCameraUsageDescription: "FormCheck uses the camera to analyze your lifting form in real time. Video is processed on-device and never leaves your phone."
+        NSPhotoLibraryAddUsageDescription: "FormCheck saves your exported rep replays to your photo library when you choose to."
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         # On-device only, no proprietary crypto — skips the export-compliance
         # question on every App Store Connect upload.
         ITSAppUsesNonExemptEncryption: false
@@ -25,10 +34,6 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.formcheck.app
-        INFOPLIST_KEY_NSCameraUsageDescription: "FormCheck uses the camera to analyze your lifting form in real time. Video is processed on-device and never leaves your phone."
-        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "FormCheck saves your exported rep replays to your photo library when you choose to."
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 64BD3MXBAX

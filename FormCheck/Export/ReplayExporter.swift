@@ -73,43 +73,59 @@ enum ReplayExporter {
             .cropped(to: CGRect(x: 0, y: 0, width: width, height: height))
         var poseIndex = 0
 
-        while let sample = readerOutput.copyNextSampleBuffer() {
-            guard let source = CMSampleBufferGetImageBuffer(sample) else { continue }
+        do {
+            while let sample = readerOutput.copyNextSampleBuffer() {
+                guard let source = CMSampleBufferGetImageBuffer(sample) else { continue }
 
-            while !input.isReadyForMoreMediaData {
-                try await Task.sleep(nanoseconds: 5_000_000)
+                while !input.isReadyForMoreMediaData {
+                    // Bail if the writer failed asynchronously (disk full, encoder
+                    // error) — isReadyForMoreMediaData may never become true again.
+                    guard writer.status == .writing else { throw ReplayExportError.writerFailed }
+                    try await Task.sleep(nanoseconds: 5_000_000)
+                }
+                guard let pool = adaptor.pixelBufferPool else { throw ReplayExportError.writerFailed }
+                var destination: CVPixelBuffer?
+                CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pool, &destination)
+                guard let dest = destination else { throw ReplayExportError.writerFailed }
+
+                ciContext.render(xray ? blackFrame : CIImage(cvPixelBuffer: source), to: dest)
+
+                let pts = CMSampleBufferGetPresentationTimeStamp(sample)
+                let pose = nearestPose(in: recording.poses, at: pts.seconds, from: &poseIndex)
+                // Dust puff over the last stretch of the clip — the lockout moment.
+                let puffWindow = 0.35
+                let puffStart = clip.end - puffWindow
+                let puffProgress: CGFloat? = pts.seconds >= puffStart
+                    ? CGFloat(min(1, (pts.seconds - puffStart) / puffWindow))
+                    : nil
+                overlay.draw(on: dest, pose: pose, puffProgress: puffProgress,
+                             trail: trail, at: pts.seconds)
+
+                let outputTime = CMTimeMultiplyByFloat64(CMTimeSubtract(pts, clipStart),
+                                                         multiplier: Float64(slowMotionFactor))
+                guard adaptor.append(dest, withPresentationTime: outputTime) else {
+                    throw ReplayExportError.writerFailed
+                }
             }
-            guard let pool = adaptor.pixelBufferPool else { throw ReplayExportError.writerFailed }
-            var destination: CVPixelBuffer?
-            CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pool, &destination)
-            guard let dest = destination else { throw ReplayExportError.writerFailed }
 
-            ciContext.render(xray ? blackFrame : CIImage(cvPixelBuffer: source), to: dest)
-
-            let pts = CMSampleBufferGetPresentationTimeStamp(sample)
-            let pose = nearestPose(in: recording.poses, at: pts.seconds, from: &poseIndex)
-            // Dust puff over the last stretch of the clip — the lockout moment.
-            let puffWindow = 0.35
-            let puffStart = clip.end - puffWindow
-            let puffProgress: CGFloat? = pts.seconds >= puffStart
-                ? CGFloat(min(1, (pts.seconds - puffStart) / puffWindow))
-                : nil
-            overlay.draw(on: dest, pose: pose, puffProgress: puffProgress,
-                         trail: trail, at: pts.seconds)
-
-            let outputTime = CMTimeMultiplyByFloat64(CMTimeSubtract(pts, clipStart),
-                                                     multiplier: Float64(slowMotionFactor))
-            guard adaptor.append(dest, withPresentationTime: outputTime) else {
-                throw ReplayExportError.writerFailed
-            }
+            if reader.status == .failed { throw ReplayExportError.readerFailed }
+        } catch {
+            // Finalize both ends and remove the partial file — otherwise the
+            // writer stays open and junk .mp4s pile up in tmp.
+            reader.cancelReading()
+            writer.cancelWriting()
+            try? FileManager.default.removeItem(at: outputURL)
+            throw error
         }
 
-        if reader.status == .failed { throw ReplayExportError.readerFailed }
         input.markAsFinished()
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             writer.finishWriting { continuation.resume() }
         }
-        guard writer.status == .completed else { throw ReplayExportError.writerFailed }
+        guard writer.status == .completed else {
+            try? FileManager.default.removeItem(at: outputURL)
+            throw ReplayExportError.writerFailed
+        }
         return outputURL
     }
 

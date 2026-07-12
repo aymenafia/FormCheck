@@ -39,14 +39,17 @@ final class CameraManager: NSObject, ObservableObject {
 
     func start(side: CameraSide) {
         updateRotationAngle()
+        // Capture the angle on the main thread — configureAndRun runs on the
+        // sessionQueue and must not read the @Published property cross-thread.
+        let angle = videoRotationAngle
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
-            sessionQueue.async { self.configureAndRun(side: side) }
+            sessionQueue.async { self.configureAndRun(side: side, angle: angle) }
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                 guard let self else { return }
                 if granted {
-                    self.sessionQueue.async { self.configureAndRun(side: side) }
+                    self.sessionQueue.async { self.configureAndRun(side: side, angle: angle) }
                 } else {
                     DispatchQueue.main.async { self.permissionDenied = true }
                 }
@@ -127,7 +130,7 @@ final class CameraManager: NSObject, ObservableObject {
         }
     }
 
-    private func configureAndRun(side: CameraSide) {
+    private func configureAndRun(side: CameraSide, angle: CGFloat) {
         if !isConfigured || configuredSide != side {
             session.beginConfiguration()
             // 720p is plenty for pose detection and keeps Vision fast.
@@ -166,7 +169,6 @@ final class CameraManager: NSObject, ObservableObject {
                     connection.automaticallyAdjustsVideoMirroring = false
                     connection.isVideoMirrored = side == .front
                 }
-                let angle = videoRotationAngle
                 if connection.isVideoRotationAngleSupported(angle) {
                     connection.videoRotationAngle = angle
                 }

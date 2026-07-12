@@ -144,8 +144,12 @@ final class RepStateMachine {
         switch phase {
         case .calibrating:
             // Bench: only calibrate the lockout height while the arms are
-            // actually extended, so racked/unracking positions don't pollute it.
-            if exercise.tracksWrists, (frame.maxElbowExtensionDegrees ?? 0) < 150 {
+            // actually extended, so racked/unracking positions don't pollute
+            // it. Missing elbow data must NOT block — occluded elbows would
+            // otherwise leave the user stuck at "Hold still…" forever; the
+            // stillness gate below still protects the baseline.
+            if exercise.tracksWrists,
+               let elbow = frame.maxElbowExtensionDegrees, elbow < 150 {
                 break
             }
             calibrationSamples.append(hipY)
@@ -178,9 +182,12 @@ final class RepStateMachine {
                 minEarlyShoulderHipRatio = nil
                 maxBarDrift = nil
                 setPhase(.descending)
-            } else {
-                // Slowly track drift (user shifting stance / camera settling).
-                standingHipY = standingHipY * 0.95 + hipY * 0.05
+            } else if abs(hipY - standingHipY) < descentThreshold * 0.4 {
+                // Track slow drift (stance shifts, camera settling) — but only
+                // in a tight band around the baseline. An unbounded EMA here
+                // would chase the hip down during a slow tempo eccentric and
+                // the rep would never trigger.
+                standingHipY = standingHipY * 0.98 + hipY * 0.02
             }
 
         case .descending:

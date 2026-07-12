@@ -53,9 +53,12 @@ struct SetSummaryView: View {
                     Text("Set Grade")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Text(summary.grade)
+                    // No reps ≠ an F — show a neutral dash instead of failing
+                    // someone for an empty set.
+                    Text(summary.clips.isEmpty ? "—" : summary.grade)
                         .font(.system(size: 56, weight: .black, design: .rounded))
-                        .foregroundStyle(summary.averageScore >= 80 ? .green : .orange)
+                        .foregroundStyle(summary.clips.isEmpty ? Color.secondary
+                                         : summary.averageScore >= 80 ? Color.green : Color.orange)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {

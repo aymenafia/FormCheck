@@ -495,10 +495,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 64BD3MXBAX;
 				INFOPLIST_FILE = FormCheck/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "FormCheck uses the camera to analyze your lifting form in real time. Video is processed on-device and never leaves your phone.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "FormCheck saves your exported rep replays to your photo library when you choose to.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -519,10 +515,6 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 64BD3MXBAX;
 				INFOPLIST_FILE = FormCheck/Info.plist;
-				INFOPLIST_KEY_NSCameraUsageDescription = "FormCheck uses the camera to analyze your lifting form in real time. Video is processed on-device and never leaves your phone.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "FormCheck saves your exported rep replays to your photo library when you choose to.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

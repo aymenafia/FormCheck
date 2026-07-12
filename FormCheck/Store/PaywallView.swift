@@ -67,16 +67,31 @@ struct PaywallView: View {
     private var planCards: some View {
         VStack(spacing: 12) {
             if store.products.isEmpty {
-                ProgressView("Loading plans…")
-                    .padding(.vertical, 24)
+                if store.isLoadingProducts {
+                    ProgressView("Loading plans…")
+                        .padding(.vertical, 24)
+                } else {
+                    // Load failed (offline?) — never leave the user with an
+                    // infinite spinner and no way forward.
+                    VStack(spacing: 10) {
+                        Text("Couldn't load subscription plans.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Button("Try Again") {
+                            Task { await store.loadProducts() }
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .padding(.vertical, 20)
+                }
             } else {
                 if let yearly = store.yearly {
                     planCard(
                         id: yearly.id,
                         title: "Yearly",
                         price: "\(yearly.displayPrice) / year",
-                        detail: "That's under $0.80 a week",
-                        badge: "BEST VALUE · SAVE 89%"
+                        detail: yearlyDetail(for: yearly),
+                        badge: savingsBadge(yearly: yearly, weekly: store.weekly)
                     )
                 }
                 if let weekly = store.weekly {
@@ -90,6 +105,23 @@ struct PaywallView: View {
                 }
             }
         }
+    }
+
+    /// Derived marketing math must come from storefront prices — hardcoded
+    /// USD figures would be wrong (and in the wrong currency) elsewhere.
+    private func yearlyDetail(for yearly: Product) -> String {
+        let perWeek = yearly.price / 52
+        return "That's \(perWeek.formatted(yearly.priceFormatStyle)) a week"
+    }
+
+    private func savingsBadge(yearly: Product, weekly: Product?) -> String {
+        guard let weekly else { return "BEST VALUE" }
+        let fullYearAtWeekly = weekly.price * 52
+        guard fullYearAtWeekly > 0 else { return "BEST VALUE" }
+        let fraction = (fullYearAtWeekly - yearly.price) / fullYearAtWeekly
+        let percent = Int((NSDecimalNumber(decimal: fraction).doubleValue * 100).rounded())
+        guard percent > 0 else { return "BEST VALUE" }
+        return "BEST VALUE · SAVE \(percent)%"
     }
 
     private func planCard(id: String, title: String, price: String, detail: String, badge: String?) -> some View {

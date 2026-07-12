@@ -42,6 +42,7 @@ final class SessionViewModel: ObservableObject {
     private var repMetrics: [RepMetrics] = []
     private var depthFiredThisRep = false
     private var depthRawStreak = 0
+    private var isEndingSet = false
     private var currentRepPoses: [(time: TimeInterval, pose: PoseFrame)] = []
     private var bestRepPoses: [(offset: TimeInterval, pose: PoseFrame)] = []
     private var bestRepScore = -1
@@ -83,16 +84,19 @@ final class SessionViewModel: ObservableObject {
             }
             self.currentRepPoses = []
         }
-        stateMachine.onPhaseChanged = { [weak self] phase in
+        stateMachine.onPhaseChanged = { [weak self] newPhase in
             guard let self else { return }
-            self.phase = phase
-            switch phase {
+            // Ghost starts only on a rep's FIRST descent (standing → descending);
+            // a mid-rep bounce back into .descending must not restart it.
+            let wasStanding = self.phase == .standing
+            self.phase = newPhase
+            switch newPhase {
             case .standing:
                 self.depthFiredThisRep = false
                 self.ghostStartTime = nil
                 self.ghostPose = nil
             case .descending:
-                self.ghostPending = true
+                if wasStanding { self.ghostPending = true }
             default:
                 break
             }
@@ -115,7 +119,9 @@ final class SessionViewModel: ObservableObject {
         bestRepScore = -1
         ghostStartTime = nil
         ghostPending = false
+        isEndingSet = false
         completedSet = nil
+        cleanUpOldTempVideos()
         latestPose = nil
         liveWarning = nil
         placementComplete = false
@@ -303,6 +309,10 @@ final class SessionViewModel: ObservableObject {
     }
 
     func endSet() {
+        // Idempotence: a double-tap must not add the set to history twice or
+        // clobber the real summary with a recording-less one.
+        guard isActive, !isEndingSet else { return }
+        isEndingSet = true
         camera.stopRecording { [weak self] recording in
             guard let self else { return }
             let summary = SetSummary(clips: self.makeClips(recording: recording),
@@ -339,7 +349,29 @@ final class SessionViewModel: ObservableObject {
     }
 
     func finishSession() {
+        // The set recording is only needed for exports from the summary sheet.
+        if let url = completedSet?.recording?.url {
+            DispatchQueue.global(qos: .utility).async {
+                try? FileManager.default.removeItem(at: url)
+            }
+        }
         completedSet = nil
         isActive = false
+    }
+
+    /// Sweep set recordings and exported clips from previous sessions out of
+    /// tmp — the OS only purges it opportunistically, and 720p video adds up.
+    private func cleanUpOldTempVideos() {
+        DispatchQueue.global(qos: .utility).async {
+            let tmp = FileManager.default.temporaryDirectory
+            guard let files = try? FileManager.default.contentsOfDirectory(
+                at: tmp, includingPropertiesForKeys: nil) else { return }
+            for url in files {
+                let name = url.lastPathComponent
+                if name.hasPrefix("formcheck-set-") || name.hasPrefix("FormCheck-rep") {
+                    try? FileManager.default.removeItem(at: url)
+                }
+            }
+        }
     }
 }

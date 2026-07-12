@@ -20,5 +20,17 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>FormCheck uses the camera to analyze your lifting form in real time. Video is processed on-device and never leaves your phone.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>FormCheck saves your exported rep replays to your photo library when you choose to.</string>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
 </dict>
 </plist>
