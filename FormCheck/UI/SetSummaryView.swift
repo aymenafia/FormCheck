@@ -7,6 +7,7 @@ struct SetSummaryView: View {
     @State private var exportingClipID: UUID?
     @State private var shareItem: ShareItem?
     @State private var exportErrorMessage: String?
+    @State private var showSavedToast = false
 
     private struct ShareItem: Identifiable {
         let id = UUID()
@@ -43,6 +44,19 @@ struct SetSummaryView: View {
                     ConfettiView()
                 }
             }
+            .overlay(alignment: .bottom) {
+                if showSavedToast {
+                    Label("Saved to Photos", systemImage: "checkmark.circle.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 12)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .foregroundStyle(.green)
+                        .padding(.bottom, 32)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.snappy, value: showSavedToast)
         }
     }
 
@@ -159,14 +173,19 @@ struct SetSummaryView: View {
         if summary.recording != nil, clip.isExportable {
             Menu {
                 Button {
+                    export(clip, xray: false, save: true)
+                } label: {
+                    Label("Save to Photos", systemImage: "square.and.arrow.down")
+                }
+                Button {
                     export(clip, xray: false)
                 } label: {
-                    Label("Export Replay", systemImage: "film")
+                    Label("Share Replay", systemImage: "square.and.arrow.up")
                 }
                 Button {
                     export(clip, xray: true)
                 } label: {
-                    Label("Skeleton Only (anonymous)", systemImage: "figure.stand")
+                    Label("Share Skeleton Only (anonymous)", systemImage: "figure.stand")
                 }
             } label: {
                 if exportingClipID == clip.id {
@@ -181,13 +200,21 @@ struct SetSummaryView: View {
         }
     }
 
-    private func export(_ clip: RepClip, xray: Bool) {
+    /// `save: true` writes straight to Photos; otherwise opens the share sheet.
+    private func export(_ clip: RepClip, xray: Bool, save: Bool = false) {
         guard let recording = summary.recording else { return }
         exportingClipID = clip.id
         Task {
             do {
                 let url = try await ReplayExporter.export(recording: recording, clip: clip, xray: xray)
-                shareItem = ShareItem(url: url)
+                if save {
+                    try await PhotoSaver.saveVideo(at: url)
+                    showSavedToast = true
+                    try? await Task.sleep(nanoseconds: 1_800_000_000)
+                    showSavedToast = false
+                } else {
+                    shareItem = ShareItem(url: url)
+                }
             } catch {
                 exportErrorMessage = error.localizedDescription
             }
