@@ -1,0 +1,37 @@
+name: FormCheck
+options:
+  bundleIdPrefix: com.formcheck
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+targets:
+  FormCheck:
+    type: application
+    platform: iOS
+    sources:
+      - FormCheck
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.formcheck.app
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_NSCameraUsageDescription: "FormCheck uses the camera to analyze your lifting form in real time. Video is processed on-device and never leaves your phone."
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "FormCheck saves your exported rep replays to your photo library when you choose to."
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+schemes:
+  FormCheck:
+    build:
+      targets:
+        FormCheck: all
+    run:
+      config: Debug
+      storeKitConfiguration: Products.storekit
+    archive:
+      config: Release

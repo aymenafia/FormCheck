@@ -1,0 +1,87 @@
+{
+  "identifier" : "A1B2C3D4-E5F6-4A7B-8C9D-000000000001",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21000001",
+      "localizations" : [
+
+      ],
+      "name" : "FormCheck Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "6.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "21000002",
+          "introductoryOffer" : {
+            "internalID" : "21000003",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "Weekly access to your AI squat coach",
+              "displayName" : "FormCheck Pro Weekly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "formcheck.weekly",
+          "recurringSubscriptionPeriod" : "P1W",
+          "referenceName" : "Weekly",
+          "subscriptionGroupID" : "21000001",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "39.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "21000004",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "A full year of your AI squat coach",
+              "displayName" : "FormCheck Pro Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "formcheck.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Yearly",
+          "subscriptionGroupID" : "21000001",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}
