@@ -282,9 +282,13 @@ struct PaywallView: View {
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 0) {
-                    Text(package.perWeekPrice ?? product.localizedPriceString)
+                    // Apple 3.1.2: the billed amount must be the most prominent price.
+                    Text(product.localizedPriceString)
                         .font(.headline.weight(.heavy)).foregroundStyle(.white)
-                    Text("per week").font(.caption2).foregroundStyle(.white.opacity(0.5))
+                    Text("per \(package.periodWord)").font(.caption2).foregroundStyle(.white.opacity(0.5))
+                    if package.periodWord == "year", let weekly = package.perWeekPrice {
+                        Text("only \(weekly)/wk").font(.caption2.weight(.bold)).foregroundStyle(Color.lime)
+                    }
                 }
             }
             .padding(16)

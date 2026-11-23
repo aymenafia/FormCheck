@@ -52,7 +52,7 @@ struct LiveSessionView: View {
             }
 
             if camera.permissionDenied {
-                PermissionDeniedView()
+                PermissionDeniedView(onBack: { session.cancelSession() })
             }
         }
         .animation(.easeInOut(duration: 0.35), value: session.placementComplete)
@@ -77,6 +77,8 @@ struct LiveSessionView: View {
 }
 
 private struct PermissionDeniedView: View {
+    let onBack: () -> Void
+
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "video.slash.fill")
@@ -93,6 +95,10 @@ private struct PermissionDeniedView: View {
                 }
             }
             .buttonStyle(.borderedProminent)
+            .foregroundStyle(.black)
+            Button("Back", action: onBack)
+                .foregroundStyle(.secondary)
+                .padding(.top, 4)
         }
         .padding(32)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
