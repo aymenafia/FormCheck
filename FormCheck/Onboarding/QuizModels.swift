@@ -16,31 +16,31 @@ struct QuizQuestion: Identifiable {
 enum OnboardingQuiz {
     static let questions: [QuizQuestion] = [
         QuizQuestion(
-            id: "load",
-            title: "What's your current squat?",
-            subtitle: "So we calibrate feedback to your level.",
-            options: [
-                QuizOption(emoji: "🏃", label: "Just bodyweight"),
-                QuizOption(emoji: "🏋️", label: "Under 60 kg / 135 lb"),
-                QuizOption(emoji: "💪", label: "60–100 kg / 135–225 lb"),
-                QuizOption(emoji: "🦍", label: "Over 100 kg / 225 lb"),
-            ]
-        ),
-        QuizQuestion(
             id: "goal",
             title: "What's your #1 goal?",
-            subtitle: "Your coaching profile adapts to it.",
+            subtitle: "Your coaching plan adapts to it.",
             options: [
                 QuizOption(emoji: "📈", label: "Get stronger"),
-                QuizOption(emoji: "🍗", label: "Build muscle"),
+                QuizOption(emoji: "💪", label: "Build muscle"),
                 QuizOption(emoji: "🎯", label: "Fix my technique"),
                 QuizOption(emoji: "🛡️", label: "Avoid injury"),
             ]
         ),
         QuizQuestion(
+            id: "load",
+            title: "How experienced are you?",
+            subtitle: "So feedback matches your level.",
+            options: [
+                QuizOption(emoji: "🌱", label: "Just starting out"),
+                QuizOption(emoji: "🏋️", label: "Under 1 year"),
+                QuizOption(emoji: "🔥", label: "1–3 years"),
+                QuizOption(emoji: "🦍", label: "3+ years"),
+            ]
+        ),
+        QuizQuestion(
             id: "pain",
             title: "Any aches after leg day?",
-            subtitle: "Pain is usually a form signal, not a strength one.",
+            subtitle: "Pain is often a form signal, not a strength one.",
             options: [
                 QuizOption(emoji: "🦵", label: "Knees"),
                 QuizOption(emoji: "🔻", label: "Lower back"),
@@ -48,26 +48,40 @@ enum OnboardingQuiz {
                 QuizOption(emoji: "✅", label: "No pain"),
             ]
         ),
+        QuizQuestion(
+            id: "place",
+            title: "Where do you train?",
+            subtitle: "FormCheck works anywhere your phone can stand.",
+            options: [
+                QuizOption(emoji: "🏢", label: "Commercial gym"),
+                QuizOption(emoji: "🏠", label: "Home or garage gym"),
+                QuizOption(emoji: "🤸", label: "Bodyweight, anywhere"),
+                QuizOption(emoji: "🔀", label: "A mix"),
+            ]
+        ),
     ]
 
-    /// Coaching-profile lines shown on the plan screen, tailored to answers.
-    static func profileLines(goal: String, pain: String) -> [String] {
+    /// Coaching-plan lines shown on the plan screen, tailored to answers.
+    static func profileLines(goal: String, pain: String, place: String) -> [String] {
         var lines = [
             "Depth check on every single rep",
             "Live rep counting with voice callouts",
-            "Slow-mo replays of your best & worst reps",
+            "Slow-mo skeleton replays of your best & worst reps",
         ]
         if pain.contains("back") || pain.contains("Both") {
             lines.insert("Forward-lean alerts to protect your lower back", at: 1)
         } else if pain.contains("Knees") {
-            lines.insert("Descent-control alerts to reduce knee stress", at: 1)
+            lines.insert("Knee-tracking alerts (front view) to catch knee cave", at: 1)
         } else {
             lines.insert("Tempo tracking to keep your descent controlled", at: 1)
         }
+        if place.contains("Bodyweight") {
+            lines.append("Bodyweight squats & lunges count — no barbell needed")
+        }
         if goal.contains("stronger") || goal.contains("muscle") {
-            lines.append("Honest scores so every set counts")
+            lines.append("An honest A–F grade so every set counts")
         } else {
-            lines.append("A grade per set so you see progress")
+            lines.append("A grade per set so you can see yourself improve")
         }
         return lines
     }

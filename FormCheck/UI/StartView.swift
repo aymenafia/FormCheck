@@ -1,155 +1,322 @@
 import SwiftUI
 
+/// Home: Bones + your progress, pick a lift, set up the camera, go.
 struct StartView: View {
+    let isPro: Bool
+    let freeSetAvailable: Bool
     let onStart: (Exercise, ViewMode, CameraSide) -> Void
+    let onUpgrade: () -> Void
 
-    @State private var exercise: Exercise = .squat
+    @EnvironmentObject private var store: EntitlementStore
+    @ObservedObject private var history = HistoryStore.shared
+    @AppStorage("home.exercise") private var exerciseRaw = Exercise.squat.rawValue
     @State private var mode: ViewMode = .side
     @State private var cameraSide: CameraSide = .front
     @State private var showSettings = false
     @State private var showHistory = false
 
-    var body: some View {
-        // Scrolls so landscape (short) screens don't clip the setup card.
-        ScrollView(showsIndicators: false) {
-            content
-        }
-        .overlay(alignment: .topTrailing) {
-            HStack(spacing: 10) {
-                Button {
-                    showHistory = true
-                } label: {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                        .padding(10)
-                        .background(.ultraThinMaterial, in: Circle())
-                }
-                .buttonStyle(.plain)
+    private var exercise: Exercise { Exercise(rawValue: exerciseRaw) ?? .squat }
 
-                Button {
-                    showSettings = true
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                        .padding(10)
-                        .background(.ultraThinMaterial, in: Circle())
+    var body: some View {
+        ZStack {
+            GlowBackground(glowAt: UnitPoint(x: 0.85, y: 0.05), intensity: 0.22)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 18) {
+                    topBar
+                    heroCard
+                    liftPicker
+                    setupCard
+                    Color.clear.frame(height: 8)
                 }
-                .buttonStyle(.plain)
+                .padding(.horizontal, 20)
             }
-            .padding(.trailing, 20)
-            .padding(.top, 8)
+            .safeAreaInset(edge: .bottom) { startBar }
         }
         .sheet(isPresented: $showSettings) {
-            SettingsView()
+            SettingsView(isPro: isPro, onUpgrade: {
+                showSettings = false
+                onUpgrade()
+            })
+            .environmentObject(store)
         }
-        .sheet(isPresented: $showHistory) {
-            HistoryView()
-        }
-        .safeAreaInset(edge: .bottom) {
-            Button {
-                onStart(exercise, mode, cameraSide)
-            } label: {
-                Text("Start \(exercise.rawValue) Set")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 6)
+        .sheet(isPresented: $showHistory) { HistoryView() }
+        .onChange(of: exerciseRaw) { if !exercise.supportsFrontView { mode = .side } }
+    }
+
+    // MARK: - Top bar
+
+    private var topBar: some View {
+        HStack(spacing: 10) {
+            Text("FormCheck")
+                .font(.system(size: 26, weight: .black, design: .rounded))
+                .foregroundStyle(.primary)
+            if isPro {
+                Text("PRO")
+                    .font(.caption.weight(.black))
+                    .padding(.horizontal, 8).padding(.vertical, 3)
+                    .background(Color.lime, in: Capsule())
+                    .foregroundStyle(.black)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.green)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 8)
+            Spacer()
+            iconButton("clock.arrow.circlepath", "History") { showHistory = true }
+            iconButton("gearshape.fill", "Settings") { showSettings = true }
+        }
+        .padding(.top, 6)
+    }
+
+    private func iconButton(_ name: String, _ label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: name)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .frame(width: 40, height: 40)
+                .background(Circle().fill(Color.card))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+    }
+
+    // MARK: - Hero
+
+    private var heroCard: some View {
+        HStack(alignment: .bottom, spacing: 0) {
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(greeting)
+                        .font(.system(.title2, design: .rounded).weight(.heavy))
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(subGreeting)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                HStack(spacing: 16) {
+                    stat("\(setsThisWeek)", "sets this week")
+                    stat(bestGrade ?? "–", "best grade")
+                    stat("\(dayStreak)", "day streak")
+                }
+            }
+            .padding(.vertical, 18)
+            .padding(.leading, 18)
+            Spacer(minLength: 0)
+            Mascot(pose: history.records.isEmpty ? .wave : .squat, height: 150, animated: true)
+                .padding(.trailing, 4)
+        }
+        .frame(maxWidth: .infinity)
+        .card()
+        .overlay(alignment: .topTrailing) { accessChip.padding(10) }
+    }
+
+    @ViewBuilder
+    private var accessChip: some View {
+        if !isPro {
+            Button(action: onUpgrade) {
+                Label(freeSetAvailable ? "1 free set today" : "Go Pro",
+                      systemImage: freeSetAvailable ? "gift.fill" : "crown.fill")
+                    .font(.caption.weight(.bold))
+                    .padding(.horizontal, 10).padding(.vertical, 6)
+                    .background(Capsule().fill(freeSetAvailable ? Color.lime.opacity(0.18) : Color.lime))
+                    .foregroundStyle(freeSetAvailable ? Color.lime : Color.black)
+            }
+            .buttonStyle(.plain)
         }
     }
 
-    private var content: some View {
-        VStack(spacing: 28) {
-            Image(systemName: "figure.strengthtraining.traditional")
-                .font(.system(size: 64))
-                .foregroundStyle(.green)
+    private func stat(_ value: String, _ label: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text(value)
+                .font(.system(.title3, design: .rounded).weight(.black))
+                .foregroundStyle(Color.lime)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+    }
 
-            VStack(spacing: 8) {
-                Text("FormCheck")
-                    .font(.system(size: 40, weight: .black, design: .rounded))
-                Text("Real-time squat coaching.\nAll on-device — nothing leaves your phone.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
+    private var greeting: String {
+        if history.records.isEmpty { return "Ready for your\nfirst set?" }
+        if let last = history.records.first, Calendar.current.isDateInToday(last.date) { return "Nice work today." }
+        return "Let's lift."
+    }
 
-            VStack(spacing: 16) {
-                Picker("Exercise", selection: $exercise) {
-                    ForEach(Exercise.available) { exercise in
-                        Text(exercise.pickerLabel).tag(exercise)
-                    }
+    private var subGreeting: String {
+        if history.records.isEmpty { return "Bodyweight squats count. Try it right now." }
+        if let last = history.records.first { return "Last set: \(last.exercise) · \(last.grade)" }
+        return ""
+    }
+
+    private var setsThisWeek: Int {
+        let start = Calendar.current.dateInterval(of: .weekOfYear, for: Date())?.start ?? Date()
+        return history.records.filter { $0.date >= start }.count
+    }
+
+    private var bestGrade: String? {
+        let order = ["A", "B", "C", "D", "F"]
+        return history.records.map(\.grade).min { (order.firstIndex(of: $0) ?? 9) < (order.firstIndex(of: $1) ?? 9) }
+    }
+
+    private var dayStreak: Int {
+        let cal = Calendar.current
+        let days = Set(history.records.map { cal.startOfDay(for: $0.date) })
+        var day = cal.startOfDay(for: Date())
+        if !days.contains(day) { day = cal.date(byAdding: .day, value: -1, to: day)! }
+        var n = 0
+        while days.contains(day) {
+            n += 1
+            day = cal.date(byAdding: .day, value: -1, to: day)!
+        }
+        return n
+    }
+
+    // MARK: - Lift picker
+
+    private var liftPicker: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Choose your lift")
+                .font(.headline)
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+                ForEach(Exercise.available) { ex in
+                    liftCard(ex)
                 }
-                .pickerStyle(.segmented)
-
-                if exercise.supportsFrontView {
-                    Picker("Camera view", selection: $mode) {
-                        ForEach(ViewMode.allCases) { mode in
-                            Text("\(mode.rawValue) View").tag(mode)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                }
-
-                Picker("Camera", selection: $cameraSide) {
-                    ForEach(CameraSide.allCases) { side in
-                        Text(side.rawValue).tag(side)
-                    }
-                }
-                .pickerStyle(.segmented)
-
-                Text(cameraSide == .front
-                     ? "Screen faces you — live feedback visible while you lift"
-                     : "Best video quality — coaching is voice-only while you lift")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                VStack(alignment: .leading, spacing: 14) {
-                    switch (exercise, mode) {
-                    case (.squat, .side):
-                        SetupStep(number: 1, text: "Prop your phone at knee height, side-on")
-                        SetupStep(number: 2, text: "Stand ~2.5 m (8 ft) away, fully in frame")
-                        SetupStep(number: 3, text: "Checks depth, forward lean & tempo")
-                    case (.squat, .front):
-                        SetupStep(number: 1, text: "Prop your phone at knee height, facing you")
-                        SetupStep(number: 2, text: "Stand ~2.5 m (8 ft) back, fully in frame")
-                        SetupStep(number: 3, text: "Checks knee tracking & balance — use Side View for depth")
-                    case (.deadlift, _):
-                        SetupStep(number: 1, text: "Prop your phone at knee height, side-on")
-                        SetupStep(number: 2, text: "Stand at the bar, ~2.5 m (8 ft) away, fully in frame")
-                        SetupStep(number: 3, text: "Checks hip timing, bar path & lockout")
-                    case (.overheadPress, _):
-                        SetupStep(number: 1, text: "Prop your phone at waist height, side-on")
-                        SetupStep(number: 2, text: "Stand ~2.5 m (8 ft) away, whole body & bar in frame")
-                        SetupStep(number: 3, text: "Hold the bar at your shoulders to calibrate, then press")
-                    case (.lunge, _):
-                        SetupStep(number: 1, text: "Prop your phone at knee height, side-on")
-                        SetupStep(number: 2, text: "Stand ~2.5 m (8 ft) away, fully in frame")
-                        SetupStep(number: 3, text: "Checks depth & upright torso")
-                    case (.bench, _):
-                        SetupStep(number: 1, text: "Turn your phone sideways (landscape) at chest height, side-on to the bench")
-                        SetupStep(number: 2, text: "Whole bench in frame, ~2.5 m (8 ft) away")
-                        SetupStep(number: 3, text: "Hold the bar at lockout to calibrate, then press")
-                    case (.freestyle, _):
-                        SetupStep(number: 1, text: "Prop your phone up, front camera facing you")
-                        SetupStep(number: 2, text: "Stand back so your whole body is in frame")
-                        SetupStep(number: 3, text: "Dance or move — records a skeleton clip to share. No scoring.")
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .padding(20)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-            .onChange(of: exercise) {
-                if !exercise.supportsFrontView { mode = .side }
             }
         }
-        .padding(24)
+    }
+
+    private func liftCard(_ ex: Exercise) -> some View {
+        let selected = ex == exercise
+        return Button {
+            withAnimation(.snappy) { exerciseRaw = ex.rawValue }
+            UISelectionFeedbackGenerator().selectionChanged()
+        } label: {
+            VStack(alignment: .leading, spacing: 8) {
+                Image(systemName: ex.symbol)
+                    .font(.system(size: 26, weight: .semibold))
+                    .foregroundStyle(selected ? Color.black : Color.lime)
+                    .frame(width: 48, height: 48)
+                    .background(RoundedRectangle(cornerRadius: 14).fill(selected ? Color.lime : Color.lime.opacity(0.12)))
+                Text(ex.rawValue)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                Text(ex.checks)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2, reservesSpace: true)
+                    .multilineTextAlignment(.leading)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(14)
+            .card(highlighted: selected)
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Setup
+
+    private var setupCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Camera setup").font(.headline)
+
+            if exercise.supportsFrontView {
+                Picker("Camera view", selection: $mode) {
+                    ForEach(ViewMode.allCases) { mode in
+                        Text("\(mode.rawValue) View").tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+
+            Picker("Camera", selection: $cameraSide) {
+                ForEach(CameraSide.allCases) { side in
+                    Text(side.rawValue).tag(side)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Text(cameraSide == .front
+                 ? "Screen faces you — see the skeleton and cues while you lift."
+                 : "Best video quality — coaching is voice-only while you lift.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(Array(setupSteps.enumerated()), id: \.offset) { i, text in
+                    SetupStep(number: i + 1, text: text)
+                }
+            }
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .card()
+    }
+
+    private var setupSteps: [String] {
+        switch (exercise, mode) {
+        case (.squat, .side):
+            return ["Prop your phone at knee height, side-on",
+                    "Stand ~2.5 m (8 ft) away, fully in frame",
+                    "Checks depth, forward lean & tempo"]
+        case (.squat, .front):
+            return ["Prop your phone at knee height, facing you",
+                    "Stand ~2.5 m (8 ft) back, fully in frame",
+                    "Checks knee tracking & balance — use Side View for depth"]
+        case (.deadlift, _):
+            return ["Prop your phone at knee height, side-on",
+                    "Stand at the bar, ~2.5 m (8 ft) away, fully in frame",
+                    "Checks hip timing, bar path & lockout"]
+        case (.overheadPress, _):
+            return ["Prop your phone at waist height, side-on",
+                    "Stand ~2.5 m (8 ft) away, whole body & bar in frame",
+                    "Hold the bar at your shoulders to calibrate, then press"]
+        case (.lunge, _):
+            return ["Prop your phone at knee height, side-on",
+                    "Stand ~2.5 m (8 ft) away, fully in frame",
+                    "Checks depth & upright torso"]
+        case (.bench, _):
+            return ["Turn your phone sideways at chest height, side-on to the bench",
+                    "Whole bench in frame, ~2.5 m (8 ft) away",
+                    "Hold the bar at lockout to calibrate, then press"]
+        case (.freestyle, _):
+            return ["Prop your phone up, front camera facing you",
+                    "Stand back so your whole body is in frame",
+                    "Move — records a skeleton clip to share. No scoring."]
+        }
+    }
+
+    // MARK: - Start
+
+    private var startBar: some View {
+        VStack(spacing: 8) {
+            Button {
+                onStart(exercise, mode, cameraSide)
+            } label: {
+                Label(startTitle, systemImage: canStart ? "play.fill" : "lock.fill")
+            }
+            .buttonStyle(LimeButtonStyle())
+
+            if !isPro {
+                Text(freeSetAvailable
+                     ? "Free plan: 1 scored set per day · Pro: unlimited"
+                     : "Next free set tomorrow · Try Pro free for 7 days")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 10)
+        .padding(.bottom, 6)
+        .background(
+            LinearGradient(colors: [Color.ink.opacity(0), Color.ink.opacity(0.95), Color.ink],
+                           startPoint: .top, endPoint: .bottom)
+                .padding(.top, -24)
+                .ignoresSafeArea()
+        )
+    }
+
+    private var canStart: Bool { isPro || freeSetAvailable }
+
+    private var startTitle: String {
+        if isPro { return "Start \(exercise.rawValue) Set" }
+        return freeSetAvailable ? "Start Free \(exercise.rawValue) Set" : "Unlock Unlimited Sets"
     }
 }
 
@@ -160,16 +327,42 @@ private struct SetupStep: View {
     var body: some View {
         HStack(spacing: 12) {
             Text("\(number)")
-                .font(.headline)
-                .frame(width: 28, height: 28)
-                .background(Circle().fill(.green.opacity(0.25)))
+                .font(.subheadline.weight(.heavy))
+                .foregroundStyle(Color.lime)
+                .frame(width: 26, height: 26)
+                .background(Circle().fill(Color.lime.opacity(0.15)))
             Text(text)
                 .font(.subheadline)
         }
     }
 }
 
+extension Exercise {
+    var symbol: String {
+        switch self {
+        case .squat: return "figure.strengthtraining.traditional"
+        case .deadlift: return "figure.strengthtraining.functional"
+        case .overheadPress: return "dumbbell.fill"
+        case .lunge: return "figure.step.training"
+        case .bench: return "figure.strengthtraining.traditional"
+        case .freestyle: return "figure.dance"
+        }
+    }
+
+    var checks: String {
+        switch self {
+        case .squat: return "Depth, lean, knees, tempo"
+        case .deadlift: return "Hip timing, bar path, lockout"
+        case .overheadPress: return "Full lockout & lean-back"
+        case .lunge: return "Depth & upright torso"
+        case .bench: return "Touch, bounce, lockout"
+        case .freestyle: return "Skeleton clip, no score"
+        }
+    }
+}
+
 #Preview {
-    StartView { _, _, _ in }
+    StartView(isPro: false, freeSetAvailable: true, onStart: { _, _, _ in }, onUpgrade: {})
+        .environmentObject(EntitlementStore())
         .preferredColorScheme(.dark)
 }

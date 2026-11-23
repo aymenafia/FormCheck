@@ -44,11 +44,21 @@ Camera (AVFoundation, portrait-rotated buffers)
 
 Tune by filming yourself and friends — thresholds are starting points, not truth.
 
-## Monetization
+## Monetization (v1.1, Nov 2026)
 
-Onboarding quiz (3 questions → tailored "coaching profile") → hard paywall. Subscriptions run on **StoreKit 2 directly** — no SDK, no server. `Products.storekit` provides local products so purchases work in the simulator (the scheme is pre-wired to it). During development, "Skip (dev)" on the paywall bypasses it in Debug builds; reset via deleting the app.
+Onboarding (Bones intro → how it works → 4-question quiz → plan) → **soft paywall** (close X / "Not now").
+Free users get **one fully scored set per day** (`FreePass` in `Store/TrialReminder.swift`); right after it the paywall
+shows their grade (`PaywallContext.afterFreeSet`). Rationale: the v1.0 hard paywall before any camera experience lost
+most installs, and the 3-day trial was too short for a gym app (RevenueCat 2026: <4-day trials convert ~25% vs ~42% for longer).
 
-Before shipping: create the same product IDs (`formcheck.weekly` $6.99/wk with 3-day trial, `formcheck.yearly` $39.99/yr) in App Store Connect, and replace the placeholder privacy URL in `PaywallView.swift`. Swap in RevenueCat later only if you want its analytics/experiments — `EntitlementStore` is the single integration point.
+- Subscriptions via **RevenueCat** (project `FormCheck`, entitlement `pro`, offering `default` = `$rc_annual` + `$rc_weekly`).
+  `EntitlementStore` also checks StoreKit 2 `currentEntitlements` so pre-RevenueCat subscribers stay unlocked, and runs a one-time `syncPurchases()`.
+- `formcheck.yearly` $39.99 with **7-day free trial**; `formcheck.weekly` $6.99, **no trial**.
+- Trial reminder: local notification 2 days before the trial ends (`TrialReminder`).
+- Mascot art: `art/` (Gemini renders → `tools/cutout.swift` → `tools/trim.swift`), assets `bones-*`.
+- Store screenshots: `tools/shots.swift` (Vision pose on Gemini gym photos + app HUD; device frames). Raw sim captures in `AppStore/raw/`.
+- Legal pages: `relay-docs/worker.js` → `npx wrangler deploy` from `relay-docs/`.
+- Build into `~/Library/Developer/Xcode/DerivedData/FormCheck-cc` — never inside this iCloud-synced Desktop folder.
 
 ## Roadmap (from the spec)
 

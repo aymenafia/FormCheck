@@ -2,3 +2,8 @@
 xcuserdata/
 *.xcuserstate
 DerivedData/
+build/
+AppStore/raw/
+art/raw*.png
+art/bones-strip.png
+art/cut*.png

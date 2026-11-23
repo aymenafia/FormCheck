@@ -26,10 +26,40 @@ struct SettingsView: View {
 
     @Environment(\.dismiss) private var dismiss
     @StateObject private var previewFeedback = FeedbackManager()
+    @EnvironmentObject private var store: EntitlementStore
+
+    var isPro = false
+    var onUpgrade: () -> Void = {}
 
     var body: some View {
         NavigationStack {
             Form {
+                Section {
+                    if isPro {
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("FormCheck Pro is active").font(.headline)
+                                if let end = store.trialEndDate {
+                                    Text("Free trial until \(end.formatted(date: .abbreviated, time: .omitted)). We'll remind you 2 days before.")
+                                        .font(.caption).foregroundStyle(.secondary)
+                                }
+                            }
+                        } icon: {
+                            Image(systemName: "crown.fill").foregroundStyle(Color.lime)
+                        }
+                    } else {
+                        Button(action: onUpgrade) {
+                            Label("Try FormCheck Pro free", systemImage: "crown.fill")
+                                .font(.headline)
+                                .foregroundStyle(Color.lime)
+                        }
+                    }
+                    Button("Restore Purchases") { Task { await store.restorePurchases() } }
+                    Button("Redeem Offer Code") { store.presentCodeRedemption() }
+                } header: {
+                    Text("Membership")
+                }
+
                 Section {
                     Toggle("Voice callouts", isOn: $voiceEnabled)
                     Picker("Voice style", selection: $voiceStyle) {
@@ -47,15 +77,6 @@ struct SettingsView: View {
                     Toggle("Grade sounds", isOn: $soundsEnabled)
                 } footer: {
                     Text("Victory fanfare on an A set, sad trombone on an F.")
-                }
-
-                Section("Appearance") {
-                    Picker("Theme", selection: $appearance) {
-                        Text("Dark").tag("dark")
-                        Text("Light").tag("light")
-                        Text("System").tag("system")
-                    }
-                    .pickerStyle(.segmented)
                 }
 
                 Section("Support") {
@@ -81,6 +102,13 @@ struct SettingsView: View {
                     Text("FormCheck \(appVersion) · All processing happens on-device. Your video never leaves your phone.")
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
+            }
+            .alert("Purchases",
+                   isPresented: Binding(get: { store.lastError != nil },
+                                        set: { if !$0 { store.lastError = nil } })) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(store.lastError ?? "")
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0246520B76EB5EAA8BA99784 /* StartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB9F118E8E9B831B2C2034D /* StartView.swift */; };
+		05262F7305287C5233DDC34F /* TrialReminder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF62543F6EB766D739957794 /* TrialReminder.swift */; };
 		0D60A770A1F57BBB3D7B3510 /* OneEuroFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85EC0DC2E5E316688C6BAA0F /* OneEuroFilter.swift */; };
 		1203C815BB8F57341D75B67C /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE34A3BF3CC69D55C07106D3 /* HistoryView.swift */; };
 		14E6E9D7FFBCE226CFECACE8 /* HUDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135076EE8E6F21BFFE0A9173 /* HUDView.swift */; };
@@ -22,6 +23,7 @@
 		3D6A08EC9168EE4351B2E403 /* QuizModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691EB67E6BC97BAC4284CDBD /* QuizModels.swift */; };
 		3F2EFEA48D4E18049B4C43B5 /* BarTrail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59F9DDAE4D7C81B3886E4CFC /* BarTrail.swift */; };
 		4DE783426AB2EB40AFB71F54 /* LiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 421D4DD857D602AE92ACAF89 /* LiveSessionView.swift */; };
+		55A372D15F851A3FF17366F1 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 32F57370EE5187F649F5EE97 /* RevenueCat */; };
 		57D796A40F049B8054E63DF8 /* SessionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3B8ECDB4FA69AE9E5653AC /* SessionViewModel.swift */; };
 		61EC8A425DFED5328ED14A78 /* ding.wav in Resources */ = {isa = PBXBuildFile; fileRef = 7BEE4E6AF640D826DC368B85 /* ding.wav */; };
 		62AA3AE8E60C33ED77171DE2 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23BBEF6D772419545844CD6F /* ConfettiView.swift */; };
@@ -33,6 +35,7 @@
 		8C7A925A12687804AF0CC2C4 /* FormRuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE2CD30DD5526F282BE4317 /* FormRuleEngine.swift */; };
 		8D41F2455A86C84CA3908C6E /* RepEffectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 913EFD0FD325D7F1C0156EC9 /* RepEffectsView.swift */; };
 		8E46EA34D877A37650CD17A5 /* ReplayExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDD8DE2E6BDD630C7AFE14D5 /* ReplayExporter.swift */; };
+		9AA1C5B99D5B5944C9BDA9CF /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A215715FAF03A5E32FB1D42 /* Theme.swift */; };
 		9FCE8D2927E4320730FC4150 /* InstallPing.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF0983690A99F37956D21F4 /* InstallPing.swift */; };
 		A2FDAC58EA6853029D38C543 /* EntitlementStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B65CB06AF1662D27ACE475 /* EntitlementStore.swift */; };
 		A64D81749F8B1711FD18C8E8 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E08270E53D717331B556A15A /* OnboardingView.swift */; };
@@ -76,6 +79,7 @@
 		566B32AEF7981D5A1A61CA51 /* PoseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseModels.swift; sourceTree = "<group>"; };
 		58B856D5FAEF96132746DC9A /* SkeletonOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonOverlayView.swift; sourceTree = "<group>"; };
 		59F9DDAE4D7C81B3886E4CFC /* BarTrail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarTrail.swift; sourceTree = "<group>"; };
+		5A215715FAF03A5E32FB1D42 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		691EB67E6BC97BAC4284CDBD /* QuizModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizModels.swift; sourceTree = "<group>"; };
 		7269FC21E81103F4C9869F66 /* FeedbackManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackManager.swift; sourceTree = "<group>"; };
 		7BEE4E6AF640D826DC368B85 /* ding.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ding.wav; sourceTree = "<group>"; };
@@ -86,6 +90,7 @@
 		8E683F918D273BD7DFCA137C /* SessionRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionRecorder.swift; sourceTree = "<group>"; };
 		913EFD0FD325D7F1C0156EC9 /* RepEffectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepEffectsView.swift; sourceTree = "<group>"; };
 		A962274B5BE4A3A26C7E2335 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		AF62543F6EB766D739957794 /* TrialReminder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrialReminder.swift; sourceTree = "<group>"; };
 		B240F2F2784016941464C833 /* PhotoSaver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoSaver.swift; sourceTree = "<group>"; };
 		BFF0983690A99F37956D21F4 /* InstallPing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallPing.swift; sourceTree = "<group>"; };
 		C481C5ABC2CC78A59C032D6D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -101,6 +106,17 @@
 		F97693D38C8622D7F760EE53 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
 		FA082C35974E0D5EDC5BBEC9 /* victory.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = victory.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		905AB4D10BAE8FE0CEB96BD5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				55A372D15F851A3FF17366F1 /* RevenueCat in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		3B75E1404C6D7BB7976FE397 = {
@@ -134,6 +150,7 @@
 				C481C5ABC2CC78A59C032D6D /* SettingsView.swift */,
 				58B856D5FAEF96132746DC9A /* SkeletonOverlayView.swift */,
 				4FB9F118E8E9B831B2C2034D /* StartView.swift */,
+				5A215715FAF03A5E32FB1D42 /* Theme.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -174,6 +191,7 @@
 			children = (
 				43B65CB06AF1662D27ACE475 /* EntitlementStore.swift */,
 				D8EBFABA8DA5D24630CC493F /* PaywallView.swift */,
+				AF62543F6EB766D739957794 /* TrialReminder.swift */,
 			);
 			path = Store;
 			sourceTree = "<group>";
@@ -268,6 +286,7 @@
 			buildPhases = (
 				E374ACFF78FE8BB0BE4A2515 /* Sources */,
 				9385CF5E3469B7CE81AF5B7A /* Resources */,
+				905AB4D10BAE8FE0CEB96BD5 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -275,6 +294,7 @@
 			);
 			name = FormCheck;
 			packageProductDependencies = (
+				32F57370EE5187F649F5EE97 /* RevenueCat */,
 			);
 			productName = FormCheck;
 			productReference = 302A348B0FE3CB6801FB09F4 /* FormCheck.app */;
@@ -305,6 +325,9 @@
 			);
 			mainGroup = 3B75E1404C6D7BB7976FE397;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				527CBC8839D363A09BA15A8C /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
@@ -371,6 +394,8 @@
 				234349FF6723C9F02A6CE818 /* ShareSheet.swift in Sources */,
 				C2626260B408914A2B9BE7CA /* SkeletonOverlayView.swift in Sources */,
 				0246520B76EB5EAA8BA99784 /* StartView.swift in Sources */,
+				9AA1C5B99D5B5944C9BDA9CF /* Theme.swift in Sources */,
+				05262F7305287C5233DDC34F /* TrialReminder.swift in Sources */,
 				FBAC5C3956D7882B214EAAF5 /* ViewMode.swift in Sources */,
 				CB84A356B189616B14596431 /* VisionPoseProvider.swift in Sources */,
 			);
@@ -504,14 +529,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = 64BD3MXBAX;
 				INFOPLIST_FILE = FormCheck/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aymenafia.formcheck;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -524,14 +549,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = 64BD3MXBAX;
 				INFOPLIST_FILE = FormCheck/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.aymenafia.formcheck;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -560,6 +585,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		527CBC8839D363A09BA15A8C /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		32F57370EE5187F649F5EE97 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 527CBC8839D363A09BA15A8C /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;
+			productName = RevenueCat;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6B983A2A6B3BECC6FECB6BB9 /* Project object */;
 }

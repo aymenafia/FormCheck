@@ -7,12 +7,19 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
+packages:
+  RevenueCat:
+    url: https://github.com/RevenueCat/purchases-ios-spm
+    from: 5.0.0
 targets:
   FormCheck:
     type: application
     platform: iOS
     sources:
       - FormCheck
+    dependencies:
+      - package: RevenueCat
+        product: RevenueCat
     info:
       path: FormCheck/Info.plist
       properties:
@@ -40,8 +47,8 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 64BD3MXBAX
-        CURRENT_PROJECT_VERSION: 1
-        MARKETING_VERSION: 1.0.0
+        CURRENT_PROJECT_VERSION: 10
+        MARKETING_VERSION: 1.1.0
 schemes:
   FormCheck:
     build:
