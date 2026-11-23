@@ -56,7 +56,7 @@ struct LiveSessionView: View {
             }
         }
         .animation(.easeInOut(duration: 0.35), value: session.placementComplete)
-        .sheet(item: $session.completedSet) { summary in
+        .fullScreenCover(item: $session.completedSet) { summary in
             SetSummaryView(summary: summary) {
                 session.finishSession()
             }

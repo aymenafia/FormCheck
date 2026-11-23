@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var freePassTick = 0
 
     #if DEBUG
+    @State private var demoSummary: SetSummary?
     @AppStorage("debug.bypassPaywall") private var bypassPaywall = false
     private var isPro: Bool { store.isSubscribed || bypassPaywall }
     #else
@@ -51,6 +52,14 @@ struct ContentView: View {
         .fullScreenCover(item: $paywall) { context in
             PaywallView(store: store, context: context) { paywall = nil }
         }
+        #if DEBUG
+        .fullScreenCover(item: $demoSummary) { SetSummaryView(summary: $0) { demoSummary = nil } }
+        .task {
+            let args = ProcessInfo.processInfo.arguments
+            if args.contains("-seedHistory") { DemoData.seedHistory() }
+            if args.contains("-demoSummary") { demoSummary = DemoData.summary() }
+        }
+        #endif
         .onChange(of: session.completedSet?.id) {
             guard freeSetInProgress, let summary = session.completedSet,
                   !summary.isFreestyle, !summary.reps.isEmpty else { return }

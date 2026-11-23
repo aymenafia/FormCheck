@@ -1,3 +1,4 @@
+import Charts
 import SwiftUI
 
 /// Home: Bones + your progress, pick a lift, set up the camera, go.
@@ -14,6 +15,9 @@ struct StartView: View {
     @State private var cameraSide: CameraSide = .front
     @State private var showSettings = false
     @State private var showHistory = false
+    @State private var showTrophies = false
+    @AppStorage(WorkoutReminder.enabledKey) private var reminderOn = false
+    @AppStorage(WorkoutReminder.askedKey) private var reminderAsked = false
 
     private var exercise: Exercise { Exercise(rawValue: exerciseRaw) ?? .squat }
 
@@ -24,6 +28,8 @@ struct StartView: View {
                 VStack(spacing: 18) {
                     topBar
                     heroCard
+                    if history.records.count >= 2 { progressCard }
+                    if !history.records.isEmpty, !reminderOn, !reminderAsked { reminderCard }
                     liftPicker
                     setupCard
                     Color.clear.frame(height: 8)
@@ -39,7 +45,10 @@ struct StartView: View {
             })
             .environmentObject(store)
         }
-        .sheet(isPresented: $showHistory) { HistoryView() }
+        .sheet(isPresented: $showHistory) {
+            HistoryView(isPro: isPro, onUpgrade: onUpgrade)
+        }
+        .sheet(isPresented: $showTrophies) { TrophyView() }
         .onChange(of: exerciseRaw) { if !exercise.supportsFrontView { mode = .side } }
     }
 
@@ -58,6 +67,7 @@ struct StartView: View {
                     .foregroundStyle(.black)
             }
             Spacer()
+            iconButton("trophy.fill", "Trophies") { showTrophies = true }
             iconButton("clock.arrow.circlepath", "History") { showHistory = true }
             iconButton("gearshape.fill", "Settings") { showSettings = true }
         }
@@ -82,6 +92,7 @@ struct StartView: View {
         HStack(alignment: .bottom, spacing: 0) {
             VStack(alignment: .leading, spacing: 14) {
                 VStack(alignment: .leading, spacing: 4) {
+                    accessChip.padding(.bottom, 4)
                     Text(greeting)
                         .font(.system(.title2, design: .rounded).weight(.heavy))
                         .fixedSize(horizontal: false, vertical: true)
@@ -104,7 +115,6 @@ struct StartView: View {
         }
         .frame(maxWidth: .infinity)
         .card()
-        .overlay(alignment: .topTrailing) { accessChip.padding(10) }
     }
 
     @ViewBuilder
@@ -166,6 +176,94 @@ struct StartView: View {
             day = cal.date(byAdding: .day, value: -1, to: day)!
         }
         return n
+    }
+
+    // MARK: - Progress
+
+    private var recentScores: [(Int, Int)] {
+        Array(history.records.prefix(12).reversed().map(\.averageScore).enumerated())
+    }
+
+    private var progressCard: some View {
+        let unlocked = Achievements.unlocked(in: history.records).count
+        let scores = recentScores.map(\.1)
+        let delta = (scores.last ?? 0) - (scores.first ?? 0)
+        let floor = max(0, (scores.min() ?? 0) - 10)
+        return HStack(spacing: 14) {
+            Button { showHistory = true } label: {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 6) {
+                        Text("Form trend").font(.subheadline.weight(.bold))
+                        Text((delta >= 0 ? "▲ " : "▼ ") + "\(abs(delta))")
+                            .font(.caption.weight(.heavy))
+                            .foregroundStyle(delta >= 0 ? Color.lime : Color.orange)
+                    }
+                    Chart(recentScores, id: \.0) { item in
+                        AreaMark(x: .value("Set", item.0), yStart: .value("Base", floor), yEnd: .value("Score", item.1))
+                            .foregroundStyle(LinearGradient(colors: [Color.lime.opacity(0.35), .clear],
+                                                            startPoint: .top, endPoint: .bottom))
+                            .interpolationMethod(.monotone)
+                        LineMark(x: .value("Set", item.0), y: .value("Score", item.1))
+                            .foregroundStyle(Color.lime)
+                            .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                            .interpolationMethod(.monotone)
+                    }
+                    .chartXAxis(.hidden)
+                    .chartYAxis(.hidden)
+                    .chartYScale(domain: floor...100)
+                    .frame(height: 46)
+                }
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .card()
+            }
+            .buttonStyle(.plain)
+
+            Button { showTrophies = true } label: {
+                VStack(spacing: 6) {
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 26))
+                        .foregroundStyle(LinearGradient(colors: [.lime, .limeDeep], startPoint: .top, endPoint: .bottom))
+                    Text("\(unlocked)/\(Badge.allCases.count)")
+                        .font(.system(.headline, design: .rounded).weight(.black))
+                    Text("trophies").font(.caption2).foregroundStyle(.secondary)
+                }
+                .frame(width: 92)
+                .padding(.vertical, 14)
+                .card()
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var reminderCard: some View {
+        HStack(spacing: 12) {
+            Mascot(pose: .thumbs, height: 64, animated: false)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Want a nudge from Bones?").font(.subheadline.weight(.bold))
+                Text("A quick daily reminder at training time keeps your streak alive.")
+                    .font(.caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 8) {
+                    Button {
+                        Task { reminderOn = await WorkoutReminder.enable(at: WorkoutReminder.minutes) }
+                    } label: {
+                        Text("Remind me at 6 PM")
+                            .font(.caption.weight(.heavy))
+                            .padding(.horizontal, 12).padding(.vertical, 7)
+                            .background(Color.lime, in: Capsule())
+                            .foregroundStyle(.black)
+                    }
+                    Button("Not now") { reminderAsked = true }
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .card()
     }
 
     // MARK: - Lift picker

@@ -155,7 +155,8 @@ struct PaywallView: View {
             benefit("figure.strengthtraining.traditional", "Unlimited sets", "Squat, deadlift, overhead press & lunge")
             benefit("waveform.path.ecg", "Live coaching on every rep", "Depth, lean, knee cave, bar path, tempo")
             benefit("film.stack", "Slow-mo skeleton replays", "See your worst rep. Share your best.")
-            benefit("chart.line.uptrend.xyaxis", "Form score history", "Watch your grades climb week by week")
+            benefit("wrench.and.screwdriver", "A drill for every fault", "Bones tells you exactly how to fix it")
+            benefit("chart.line.uptrend.xyaxis", "Progress trends & trophies", "Watch your grades climb week by week")
             benefit("lock.shield", "100% on-device", "Your video never leaves your phone")
         }
         .padding(18)

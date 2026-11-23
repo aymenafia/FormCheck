@@ -59,7 +59,7 @@ struct GhostButtonStyle: ButtonStyle {
             .foregroundStyle(.white.opacity(0.75))
             .frame(maxWidth: .infinity)
             .padding(.vertical, 14)
-            .background(Capsule().strokeBorder(Color.white.opacity(0.15)))
+            .background(Capsule().fill(Color.ink.opacity(0.9)).overlay(Capsule().strokeBorder(Color.white.opacity(0.15))))
             .opacity(configuration.isPressed ? 0.6 : 1)
     }
 }

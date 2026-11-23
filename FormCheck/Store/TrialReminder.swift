@@ -58,3 +58,69 @@ enum FreePass {
         return f.string(from: Date())
     }
 }
+
+/// Opt-in daily nudge from Bones at the user's training time. One repeating
+/// notification per weekday so the copy doesn't go stale. Local only.
+enum WorkoutReminder {
+    static let enabledKey = "reminder.enabled"
+    static let minutesKey = "reminder.minutes"   // minutes after midnight
+    static let askedKey = "reminder.asked"
+    private static let prefix = "formcheck.workout."
+
+    static var minutes: Int {
+        let m = UserDefaults.standard.object(forKey: minutesKey) as? Int
+        return m ?? 18 * 60
+    }
+
+    private static let lines: [String] = [
+        "Sunday squats hit different. One set, I'll grade it. 💀",
+        "Monday = new grade. Prop the phone, let's go.",
+        "Your knees called. They want a form check.",
+        "Midweek check-in: one clean set keeps the streak alive. 🔥",
+        "Bet you can beat your last grade today.",
+        "Friday form check — finish the week strong.",
+        "Weekend lifters get the best grades. Prove it.",
+    ]
+
+    /// Asks permission if needed; returns whether reminders are now on.
+    @discardableResult
+    static func enable(at minutes: Int) async -> Bool {
+        let center = UNUserNotificationCenter.current()
+        var status = await center.notificationSettings().authorizationStatus
+        if status == .notDetermined {
+            _ = try? await center.requestAuthorization(options: [.alert, .sound, .badge])
+            status = await center.notificationSettings().authorizationStatus
+        }
+        UserDefaults.standard.set(true, forKey: askedKey)
+        guard status == .authorized || status == .provisional else {
+            UserDefaults.standard.set(false, forKey: enabledKey)
+            return false
+        }
+        UserDefaults.standard.set(minutes, forKey: minutesKey)
+        UserDefaults.standard.set(true, forKey: enabledKey)
+        schedule(minutes: minutes)
+        return true
+    }
+
+    static func disable() {
+        UserDefaults.standard.set(false, forKey: enabledKey)
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: (1...7).map { prefix + "\($0)" })
+    }
+
+    private static func schedule(minutes: Int) {
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: (1...7).map { prefix + "\($0)" })
+        for weekday in 1...7 {
+            let content = UNMutableNotificationContent()
+            content.title = "Bones is waiting"
+            content.body = lines[weekday - 1]
+            content.sound = .default
+            var comps = DateComponents()
+            comps.weekday = weekday
+            comps.hour = minutes / 60
+            comps.minute = minutes % 60
+            center.add(UNNotificationRequest(identifier: prefix + "\(weekday)", content: content,
+                                             trigger: UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)))
+        }
+    }
+}

@@ -27,6 +27,10 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var previewFeedback = FeedbackManager()
     @EnvironmentObject private var store: EntitlementStore
+    @AppStorage(WorkoutReminder.enabledKey) private var reminderOn = false
+    @State private var reminderTime = Calendar.current.date(bySettingHour: WorkoutReminder.minutes / 60,
+                                                            minute: WorkoutReminder.minutes % 60, second: 0, of: Date()) ?? Date()
+    @State private var notificationsDenied = false
 
     var isPro = false
     var onUpgrade: () -> Void = {}
@@ -58,6 +62,32 @@ struct SettingsView: View {
                     Button("Redeem Offer Code") { store.presentCodeRedemption() }
                 } header: {
                     Text("Membership")
+                }
+
+                Section {
+                    Toggle("Daily reminder", isOn: Binding(get: { reminderOn }, set: { on in
+                        Task {
+                            if on {
+                                reminderOn = await WorkoutReminder.enable(at: minutes(of: reminderTime))
+                                notificationsDenied = !reminderOn
+                            } else {
+                                WorkoutReminder.disable()
+                                reminderOn = false
+                            }
+                        }
+                    }))
+                    if reminderOn {
+                        DatePicker("Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                            .onChange(of: reminderTime) {
+                                Task { await WorkoutReminder.enable(at: minutes(of: reminderTime)) }
+                            }
+                    }
+                } header: {
+                    Text("Workout Reminder")
+                } footer: {
+                    Text(notificationsDenied
+                         ? "Notifications are off for FormCheck — turn them on in iOS Settings."
+                         : "A nudge from Bones at your training time. Stays on your phone.")
                 }
 
                 Section {
@@ -124,6 +154,11 @@ struct SettingsView: View {
                 if voiceEnabled { previewFeedback.previewVoice() }
             }
         }
+    }
+
+    private func minutes(of date: Date) -> Int {
+        let c = Calendar.current.dateComponents([.hour, .minute], from: date)
+        return (c.hour ?? 18) * 60 + (c.minute ?? 0)
     }
 
     private var appVersion: String {
