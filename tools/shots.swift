@@ -6,7 +6,9 @@
 import AppKit
 import Vision
 
-let W = 1320, H = 2868
+let env = ProcessInfo.processInfo.environment
+let W = Int(env["FC_W"] ?? "1320")!, H = Int(env["FC_H"] ?? "2868")!
+let K = Double(W) / 1320.0  // text scale
 let lime = NSColor(red: 0.616, green: 1.0, blue: 0.235, alpha: 1)
 let ink = NSColor(red: 0.035, green: 0.043, blue: 0.035, alpha: 1)
 let args = CommandLine.arguments
@@ -125,29 +127,32 @@ func frame(screen: String, out: String, l1: String, l2: String, accent: String, 
         let g = CGGradient(colorsSpace: space, colors: [lime.withAlphaComponent(0.45).cgColor, lime.withAlphaComponent(0).cgColor] as CFArray, locations: [0, 1])!
         ctx.drawRadialGradient(g, startCenter: CGPoint(x: W / 2, y: H - 200), startRadius: 0, endCenter: CGPoint(x: W / 2, y: H - 200), endRadius: 1500, options: [])
         // headline
-        let f = font(118, .black)
+        let f = font(118 * min(K, 1.25), .black)
+        let lineGap = 140 * min(K, 1.25)
         for (i, line) in [l1, l2].enumerated() {
             let a = NSMutableAttributedString(string: line, attributes: [.font: f, .foregroundColor: NSColor.white])
             if let r = line.range(of: accent) { a.addAttribute(.foregroundColor, value: lime, range: NSRange(r, in: line)) }
             let sz = a.size()
-            a.draw(at: CGPoint(x: (Double(W) - sz.width) / 2, y: Double(H) - 290 - Double(i) * 140))
+            a.draw(at: CGPoint(x: (Double(W) - sz.width) / 2, y: Double(H) - 290 * min(K, 1.25) - Double(i) * lineGap))
         }
         // device
-        let dwid = 1000.0, dhei = dwid * Double(scr.height) / Double(scr.width)
-        let rect = CGRect(x: (Double(W) - dwid) / 2, y: Double(H) - 470 - dhei, width: dwid, height: dhei)
+        let ratio = Double(scr.height) / Double(scr.width)
+        let top = 470 * min(K, 1.25)
+        let dwid = min(Double(W) * 0.76, (Double(H) - top - 60) / ratio), dhei = dwid * ratio
+        let rect = CGRect(x: (Double(W) - dwid) / 2, y: Double(H) - top - dhei, width: dwid, height: dhei)
         let bezel = rect.insetBy(dx: -26, dy: -26)
         ctx.setShadow(offset: CGSize(width: 0, height: -30), blur: 80, color: NSColor.black.withAlphaComponent(0.7).cgColor)
         ctx.setFillColor(NSColor(white: 0.08, alpha: 1).cgColor)
-        ctx.addPath(CGPath(roundedRect: bezel, cornerWidth: 150, cornerHeight: 150, transform: nil)); ctx.fillPath()
+        ctx.addPath(CGPath(roundedRect: bezel, cornerWidth: dwid * 0.15, cornerHeight: dwid * 0.15, transform: nil)); ctx.fillPath()
         ctx.setShadow(offset: .zero, blur: 0, color: nil)
         ctx.setStrokeColor(lime.withAlphaComponent(0.35).cgColor); ctx.setLineWidth(5)
-        ctx.addPath(CGPath(roundedRect: bezel, cornerWidth: 150, cornerHeight: 150, transform: nil)); ctx.strokePath()
+        ctx.addPath(CGPath(roundedRect: bezel, cornerWidth: dwid * 0.15, cornerHeight: dwid * 0.15, transform: nil)); ctx.strokePath()
         ctx.saveGState()
-        ctx.addPath(CGPath(roundedRect: rect, cornerWidth: 125, cornerHeight: 125, transform: nil)); ctx.clip()
+        ctx.addPath(CGPath(roundedRect: rect, cornerWidth: dwid * 0.125, cornerHeight: dwid * 0.125, transform: nil)); ctx.clip()
         ctx.draw(scr, in: rect)
         ctx.restoreGState()
         if let m = mascot {
-            let mi = cg(m); let s = 560.0
+            let mi = cg(m); let s = 560.0 * max(K, 1) * (Double(W) / Double(H) > 0.6 ? 1.15 : 1)
             ctx.setShadow(offset: .zero, blur: 60, color: lime.withAlphaComponent(0.5).cgColor)
             ctx.draw(mi, in: CGRect(x: Double(W) - s + 40, y: 40, width: s, height: s))
         }
