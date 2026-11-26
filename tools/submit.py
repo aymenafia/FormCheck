@@ -4,7 +4,7 @@ import json, pathlib, sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from asc import call
 APP = "6790111242"
-VER = json.loads((pathlib.Path(__file__).parent.parent / "AppStore/asc_ids.json").read_text())["version"]
+VER = json.loads((pathlib.Path(__file__).parent.parent / "AppStore/asc_ids.json").read_text())["version_111"]
 builds = call("GET", f"/v1/builds?filter[app]={APP}&filter[processingState]=VALID&filter[preReleaseVersion.version]=1.1.1&sort=-uploadedDate")["data"]
 if not builds: sys.exit("no valid 1.1.1 build yet")
 b = builds[0]["id"]; print("build", builds[0]["attributes"]["version"])
