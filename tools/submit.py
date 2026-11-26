@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Attach the newest valid build (version 1.1.0) to the App Store version and submit for review."""
+"""Attach the newest valid build (version 1.1.1) to the App Store version and submit for review."""
 import json, pathlib, sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from asc import call
 APP = "6790111242"
 VER = json.loads((pathlib.Path(__file__).parent.parent / "AppStore/asc_ids.json").read_text())["version"]
-builds = call("GET", f"/v1/builds?filter[app]={APP}&filter[processingState]=VALID&filter[preReleaseVersion.version]=1.1.0&sort=-uploadedDate")["data"]
-if not builds: sys.exit("no valid 1.1.0 build yet")
+builds = call("GET", f"/v1/builds?filter[app]={APP}&filter[processingState]=VALID&filter[preReleaseVersion.version]=1.1.1&sort=-uploadedDate")["data"]
+if not builds: sys.exit("no valid 1.1.1 build yet")
 b = builds[0]["id"]; print("build", builds[0]["attributes"]["version"])
 call("PATCH", f"/v1/builds/{b}", {"data": {"type": "builds", "id": b, "attributes": {"usesNonExemptEncryption": False}}})
 call("PATCH", f"/v1/appStoreVersions/{VER}/relationships/build", {"data": {"type": "builds", "id": b}}); print("build attached")

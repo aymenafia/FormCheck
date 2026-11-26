@@ -1,22 +1,23 @@
 import StoreKit
 import SwiftUI
 
-/// Native App Store rating prompt, shown at a moment of delight — after the
-/// user has completed a few sets and just finished a good one. Never on a
-/// failing set, never on first use, and only once. Apple additionally
-/// rate-limits the system prompt to 3 times per year.
+/// Native App Store rating prompt, shown at a moment of delight: right after a
+/// good set (A or B), including the very first one. Free users only get one
+/// set a day, so the old "after 3 sets, once ever" rule meant almost nobody
+/// was asked. Re-asks at most every 45 days; Apple additionally caps the
+/// system prompt at 3 times per year.
 enum RatingPrompt {
-    private static let askedKey = "rating.asked"
-    private static let minSets = 3
+    private static let lastAskedKey = "rating.lastAsked"
+    private static let reaskInterval: TimeInterval = 45 * 86_400
 
-    /// Whether now is a good moment to ask, given the just-finished set.
     static func shouldAsk(for summary: SetSummary) -> Bool {
-        guard !summary.clips.isEmpty, summary.grade != "F" else { return false }
-        guard !UserDefaults.standard.bool(forKey: askedKey) else { return false }
-        return UserDefaults.standard.integer(forKey: "stats.completedSets") >= minSets
+        guard !summary.clips.isEmpty, !summary.isFreestyle,
+              summary.grade == "A" || summary.grade == "B" else { return false }
+        let last = UserDefaults.standard.double(forKey: lastAskedKey)
+        return last == 0 || Date().timeIntervalSince1970 - last > reaskInterval
     }
 
     static func markAsked() {
-        UserDefaults.standard.set(true, forKey: askedKey)
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: lastAskedKey)
     }
 }
